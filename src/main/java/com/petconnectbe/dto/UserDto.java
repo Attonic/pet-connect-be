@@ -1,11 +1,8 @@
 package com.petconnectbe.dto;
 
-import com.petconnectbe.models.Endereco;
-import com.petconnectbe.models.Veterinario;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,30 +14,36 @@ import java.time.LocalDate;
 @Data
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VeterinarioDto implements Serializable {
+public class UserDto implements Serializable {
+
+    @NotBlank(message = "O tipo do Usuário deve ser informado.")
+    private String type;
 
     @NotBlank(message = "O Nome é Obrigatório.")
-    private String nome;
+    private String name;
 
     @NotBlank(message = "O E-Mail é Obrigatório.")
     @Email(message = "Formato de e-mail inválido.")
     private String email;
 
-    @NotNull(message = "A Data de Nascimento é Obrigatório.")
-    private LocalDate dataNascimento;
+    @NotBlank(message = "O Telefone deve ser informado")
+    private String phone;
 
-    @NotBlank(message = "O CRMV é Obrigatório.")
-    private String crmv;
+    @NotNull(message = "A Data de Nascimento é Obrigatório.")
+    private LocalDate birthOrFoundationDate;
 
     @NotBlank(message = "A Senha é Obrigatório.")
-    private String senha;
+    private String cpfOrCnpj;
+
 
     @NotBlank(message = "O Endereço é Obrigatório.")
     @Valid
-    private EnderecoDto endereco;
+    private AddressDto endereco;
 
-    @AssertTrue(message = "Você deve aceitar os Termos de Responsabilidade")
-    private boolean aceitaTermos;
+    @NotBlank(message = "A senha deve ser informada.")
+    private String password;
+
+
 
 
 }

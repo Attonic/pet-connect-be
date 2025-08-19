@@ -1,7 +1,7 @@
 package com.petconnectbe.controllers;
 
-import com.petconnectbe.dto.EnderecoDto;
-import com.petconnectbe.services.EnderecoService;
+import com.petconnectbe.dto.AddressDto;
+import com.petconnectbe.services.AddressService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping(name = "/enderecos")
+@RequestMapping("/addresses")
 @RequiredArgsConstructor
-public class EnderecoControler {
+public class AddressController {
 
-    private final EnderecoService enderecoService;
+    private final AddressService addressService;
 
     @PostMapping
-    public ResponseEntity<EnderecoDto> create(@Valid @RequestBody EnderecoDto enderecoDto){
-        EnderecoDto endereco = enderecoService.salvar(enderecoDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(endereco);
+    public ResponseEntity<AddressDto> create(@Valid @RequestBody AddressDto addressDto){
+        AddressDto addressDto1 = addressService.save(addressDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addressDto1);
     }
 
 
