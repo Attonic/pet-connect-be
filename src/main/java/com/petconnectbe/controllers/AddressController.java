@@ -6,12 +6,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/addresses")
@@ -27,6 +24,15 @@ public class AddressController {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressDto1);
     }
 
+    @GetMapping
+    public ResponseEntity<List<AddressDto>> findAll(){
+        List<AddressDto> addressDtos = addressService.findAll();
+        return ResponseEntity.ok(addressDtos);
+    }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<AddressDto> findById(@PathVariable UUID id){
+        AddressDto addressDto = addressService.findById(id);
+        return ResponseEntity.ok(addressDto);
+    }
 }
