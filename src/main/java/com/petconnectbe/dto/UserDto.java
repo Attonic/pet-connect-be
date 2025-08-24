@@ -36,7 +36,7 @@ public class UserDto implements Serializable {
     private String cpfOrCnpj;
 
 
-    @NotBlank(message = "O Endereço é Obrigatório.")
+    @NotNull(message = "O Endereço é Obrigatório.")
     @Valid
     private AddressDto endereco;
 

@@ -34,6 +34,8 @@ public class UserServiceImpl implements UserService {
         user.setPhone(userDto.getPhone());
         user.setBirthOrFoundationDate(userDto.getBirthOrFoundationDate());
         user.setCpfOrCnpj(userDto.getCpfOrCnpj());
+        user.setPassword(userDto.getPassword()); 
+        user.setAddress(addressService.toEntity(userDto.getEndereco()));
 
 
 
