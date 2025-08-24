@@ -1,19 +1,39 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:db
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
+    # A linha abaixo diz ao Spring para usar o driver do PostgreSQL
+    driver-class-name: org.postgresql.Driver
+    # O endereço do nosso banco de dados no Docker
+    url: jdbc:postgresql://db:5432/app_db
+    # As credenciais que definimos no docker-compose.yml
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: update # Cria/atualiza as tabelas automaticamente
+    show-sql: true # Mostra os comandos SQL no log, útil para debug
     properties:
       hibernate:
         format_sql: true
 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+
+
+
+# spring:
+#   datasource:
+#     url: jdbc:h2:mem:db
+#     driver-class-name: org.h2.Driver
+#     username: sa
+#     password:
+
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#     show-sql: true
+#     properties:
+#       hibernate:
+#         format_sql: true
+
+#   h2:
+#     console:
+#       enabled: true
+#       path: /h2-console
