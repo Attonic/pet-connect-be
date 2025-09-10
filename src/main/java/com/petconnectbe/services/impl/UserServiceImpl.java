@@ -1,7 +1,7 @@
 package com.petconnectbe.services.impl;
 
 import com.petconnectbe.dto.UserDto;
-import com.petconnectbe.models.User; 
+import com.petconnectbe.models.User;
 import com.petconnectbe.repositories.UserRepository;
 import com.petconnectbe.services.AddressService;
 import com.petconnectbe.services.UserService;
@@ -31,9 +31,8 @@ public class UserServiceImpl implements UserService {
         user.setEmail(userDto.getEmail());
         user.setPhone(userDto.getPhone());
         user.setBirthOrFoundationDate(userDto.getBirthOrFoundationDate());
-        user.setCpfOrCnpj(userDto.getCpfOrCnpj());      
+        user.setCpfOrCnpj(userDto.getCpfOrCnpj());
         user.setPassword(userDto.getPassword());
-
 
         if (userDto.getEndereco() != null) {
             user.setAddress(addressService.toEntity(userDto.getEndereco()));
@@ -46,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findById(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado")); // Mensagem ajustada
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         return toDto(user);
     }
 
@@ -58,8 +57,41 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    
-    public UserDto toDto(User user) {
+    @Override
+    public UserDto update(UUID id, UserDto userDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado para atualização."));
+
+        user.setName(userDto.getName());
+        user.setType(userDto.getType());
+        user.setEmail(userDto.getEmail());
+        user.setPhone(userDto.getPhone());
+        user.setBirthOrFoundationDate(userDto.getBirthOrFoundationDate());
+        user.setCpfOrCnpj(userDto.getCpfOrCnpj());
+
+        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+            user.setPassword(userDto.getPassword());
+        }
+
+        if (userDto.getEndereco() != null) {
+            user.setAddress(addressService.toEntity(userDto.getEndereco()));
+        } else {
+            user.setAddress(null);
+        }
+
+        User updatedUser = userRepository.save(user);
+        return toDto(updatedUser);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("Usuário não encontrado para exclusão.");
+        }
+        userRepository.deleteById(id);
+    }
+
+    private UserDto toDto(User user) {
         UserDto userDto = new UserDto();
         userDto.setUserId(user.getUserId());
         userDto.setName(user.getName());
@@ -68,7 +100,7 @@ public class UserServiceImpl implements UserService {
         userDto.setPhone(user.getPhone());
         userDto.setBirthOrFoundationDate(user.getBirthOrFoundationDate());
         userDto.setCpfOrCnpj(user.getCpfOrCnpj());
-        userDto.setPassword(user.getPassword());
+        userDto.setPassword(null);
 
         if (user.getAddress() != null) {
             userDto.setEndereco(addressService.toDto(user.getAddress()));

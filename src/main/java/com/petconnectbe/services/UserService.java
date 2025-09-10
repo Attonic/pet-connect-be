@@ -13,4 +13,8 @@ public interface UserService {
 
     List<UserDto> findAll();
 
+    UserDto update(UUID id, UserDto userDto);
+
+    void deleteById(UUID id);
+
 }
