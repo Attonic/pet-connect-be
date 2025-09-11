@@ -3,7 +3,7 @@ spring:
     # A linha abaixo diz ao Spring para usar o driver do PostgreSQL
     driver-class-name: org.postgresql.Driver
     # O endereço do nosso banco de dados no Docker
-    url: jdbc:postgresql://db:5432/app_db
+    url: jdbc:postgresql://db:5432/pet_connect
     # As credenciais que definimos no docker-compose.yml
     username: postgres
     password: postgres

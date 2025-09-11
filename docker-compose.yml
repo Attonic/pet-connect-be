@@ -6,7 +6,7 @@ services:
     image: postgres:15-alpine
     restart: always
     environment:
-      POSTGRES_DB: pet_conect
+      POSTGRES_DB: pet_connect
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pet_conect
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pet_connect
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
 
