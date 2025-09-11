@@ -19,11 +19,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AddressService addressService;
 
-
     @Override
     public UserDto save(UserDto userDto) {
-
-        if (userRepository.findByEmail(userDto.getEmail()).isPresent()){
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new RuntimeException("Email já cadastrado.");
         }
 
@@ -34,10 +32,9 @@ public class UserServiceImpl implements UserService {
         user.setPhone(userDto.getPhone());
         user.setBirthOrFoundationDate(userDto.getBirthOrFoundationDate());
         user.setCpfOrCnpj(userDto.getCpfOrCnpj());
+        user.setPassword(userDto.getPassword());
 
-
-
-        if(userDto.getEndereco() != null){
+        if (userDto.getEndereco() != null) {
             user.setAddress(addressService.toEntity(userDto.getEndereco()));
         }
 
@@ -48,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findById(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Veterinário não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         return toDto(user);
     }
 
@@ -60,25 +57,54 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public UserDto update(UUID id, UserDto userDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado para atualização."));
 
+        user.setName(userDto.getName());
+        user.setType(userDto.getType());
+        user.setEmail(userDto.getEmail());
+        user.setPhone(userDto.getPhone());
+        user.setBirthOrFoundationDate(userDto.getBirthOrFoundationDate());
+        user.setCpfOrCnpj(userDto.getCpfOrCnpj());
 
-    public UserDto toDto(User user) {
+        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+            user.setPassword(userDto.getPassword());
+        }
+
+        if (userDto.getEndereco() != null) {
+            user.setAddress(addressService.toEntity(userDto.getEndereco()));
+        } else {
+            user.setAddress(null);
+        }
+
+        User updatedUser = userRepository.save(user);
+        return toDto(updatedUser);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("Usuário não encontrado para exclusão.");
+        }
+        userRepository.deleteById(id);
+    }
+
+    private UserDto toDto(User user) {
         UserDto userDto = new UserDto();
-
+        userDto.setUserId(user.getUserId());
         userDto.setName(user.getName());
         userDto.setType(user.getType());
         userDto.setEmail(user.getEmail());
         userDto.setPhone(user.getPhone());
         userDto.setBirthOrFoundationDate(user.getBirthOrFoundationDate());
         userDto.setCpfOrCnpj(user.getCpfOrCnpj());
+        userDto.setPassword(null);
 
-
-        if(user.getAddress() != null){
+        if (user.getAddress() != null) {
             userDto.setEndereco(addressService.toDto(user.getAddress()));
         }
         return userDto;
-
     }
-
-
 }

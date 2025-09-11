@@ -40,7 +40,7 @@ public class User implements Serializable {
     @Column(name = "phone", nullable = false, length = 20)
     private String phone;
 
-    @Column(name = "birth_fundation_date", nullable = false)
+    @Column(name = "birth_foundation_date", nullable = false)
     private LocalDate birthOrFoundationDate;
 
     @Column(name = "cpf_cnpj", nullable = false, length = 18)
@@ -50,7 +50,7 @@ public class User implements Serializable {
     @JoinColumn(name = "adress_id")
     private Address address;
 
-    @Column(name = "passeord", length = 100)
+    @Column(name = "password", length = 100)
     private String password;
 
 

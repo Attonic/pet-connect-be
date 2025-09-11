@@ -15,6 +15,9 @@
     # --- FASE 2: Run (Execução) ---
     FROM eclipse-temurin:17-jre-alpine
     
+
+    RUN apk update && apk add curl
+    
     WORKDIR /app
     
     COPY --from=builder /app/target/*.jar app.jar
