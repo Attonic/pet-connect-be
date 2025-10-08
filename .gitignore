@@ -39,3 +39,6 @@ target/
 
 # VS Code specific
 .vscode/
+
+# Environment variables file
+.env

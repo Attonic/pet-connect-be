@@ -5,10 +5,8 @@ services:
   db:
     image: postgres:15-alpine
     restart: always
-    environment:
-      POSTGRES_DB: pet_connect
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+    env_file:
+      - ./.env # Aponta para o arquivo que conterá nossas senhas
     ports:
       - "5433:5432"
     volumes:
@@ -22,10 +20,8 @@ services:
       - "8080:8080"
     depends_on:
       - db
-    environment:
-      DB_URL: jdbc:postgresql://db:5432/pet_connect
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+    env_file:
+      - ./.env # Aponta para o mesmo arquivo de senhas
 
 volumes:
   postgres_data:
