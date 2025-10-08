@@ -1,1 +1,15 @@
-*.md
+# Arquivos e pastas do ambiente de desenvolvimento
+.idea/
+*.iml
+out/
+.idx/
+.vscode/
+
+# Pasta de arquivos aleatórios
+_aleatorios/
+
+# Arquivos de build do Maven
+target/
+
+# Arquivo de variáveis de ambiente
+.env
