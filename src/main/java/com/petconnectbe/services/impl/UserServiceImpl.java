@@ -5,13 +5,23 @@ import com.petconnectbe.models.User;
 import com.petconnectbe.repositories.UserRepository;
 import com.petconnectbe.services.AddressService;
 import com.petconnectbe.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Implementação do serviço {@link UserService} para gerenciar os dados dos Usuários.
+ * <p>
+ * Esta classe gerencia a lógica de negócio para as operações de CRUD de usuários,
+ * validando dados, tratando exceções e interagindo com a camada de persistência.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -19,55 +29,58 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AddressService addressService;
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalArgumentException se o email fornecido já existir no sistema.
+     */
     @Override
+    @Transactional
     public UserDto save(UserDto userDto) {
-        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
-            throw new RuntimeException("Email já cadastrado.");
-        }
+        userRepository.findByEmail(userDto.getEmail()).ifPresent(user -> {
+            throw new IllegalArgumentException("Email já cadastrado: " + userDto.getEmail());
+        });
 
-        User user = new User();
-        user.setName(userDto.getName());
-        user.setType(userDto.getType());
-        user.setEmail(userDto.getEmail());
-        user.setPhone(userDto.getPhone());
-        user.setBirthOrFoundationDate(userDto.getBirthOrFoundationDate());
-        user.setCpfOrCnpj(userDto.getCpfOrCnpj());
-        user.setPassword(userDto.getPassword());
+        User user = toEntity(userDto);
 
-        if (userDto.getEndereco() != null) {
-            user.setAddress(addressService.toEntity(userDto.getEndereco()));
-        }
-
-        User salvo = userRepository.save(user);
-        return toDto(salvo);
+        User savedUser = userRepository.save(user);
+        return toDto(savedUser);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public UserDto findById(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        return toDto(user);
+    @Transactional(readOnly = true)
+    public Optional<UserDto> findById(UUID id) {
+        return userRepository.findById(id).map(this::toDto);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> findAll() {
         return userRepository.findAll()
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+            .stream()
+            .map(this::toDto)
+            .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws EntityNotFoundException se nenhum usuário for encontrado com o ID fornecido.
+     */
     @Override
+    @Transactional
     public UserDto update(UUID id, UserDto userDto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado para atualização."));
+            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o ID: " + id));
 
-        user.setName(userDto.getName());
-        user.setType(userDto.getType());
-        user.setEmail(userDto.getEmail());
-        user.setPhone(userDto.getPhone());
-        user.setBirthOrFoundationDate(userDto.getBirthOrFoundationDate());
-        user.setCpfOrCnpj(userDto.getCpfOrCnpj());
+        // Atualiza os campos do usuário
+        BeanUtils.copyProperties(userDto, user, "id", "password", "email");
 
         if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
             user.setPassword(userDto.getPassword());
@@ -83,28 +96,43 @@ public class UserServiceImpl implements UserService {
         return toDto(updatedUser);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws EntityNotFoundException se nenhum usuário for encontrado com o ID fornecido.
+     */
     @Override
+    @Transactional
     public void deleteById(UUID id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Usuário não encontrado para exclusão.");
+            throw new EntityNotFoundException("Usuário não encontrado com o ID: " + id);
         }
         userRepository.deleteById(id);
     }
 
     private UserDto toDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setUserId(user.getUserId());
-        userDto.setName(user.getName());
-        userDto.setType(user.getType());
-        userDto.setEmail(user.getEmail());
-        userDto.setPhone(user.getPhone());
-        userDto.setBirthOrFoundationDate(user.getBirthOrFoundationDate());
-        userDto.setCpfOrCnpj(user.getCpfOrCnpj());
-        userDto.setPassword(null);
+        if (user == null) {
+            return null;
+        }
+        UserDto dto = new UserDto();
+        BeanUtils.copyProperties(user, dto, "password"); // Nunca expor a senha
 
         if (user.getAddress() != null) {
-            userDto.setEndereco(addressService.toDto(user.getAddress()));
+            dto.setEndereco(addressService.toDto(user.getAddress()));
         }
-        return userDto;
+        return dto;
+    }
+
+    private User toEntity(UserDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        User user = new User();
+        BeanUtils.copyProperties(dto, user);
+
+        if (dto.getEndereco() != null) {
+            user.setAddress(addressService.toEntity(dto.getEndereco()));
+        }
+        return user;
     }
 }

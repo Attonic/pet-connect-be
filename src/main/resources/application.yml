@@ -2,11 +2,10 @@ spring:
   datasource:
     # A linha abaixo diz ao Spring para usar o driver do PostgreSQL
     driver-class-name: org.postgresql.Driver
-    # O endereço do nosso banco de dados no Docker
-    url: jdbc:postgresql://db:5432/pet_connect
-    # As credenciais que definimos no docker-compose.yml
-    username: postgres
-    password: postgres
+    # O endereço, usuário e senha do banco de dados agora são lidos das variáveis de ambiente
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update # Cria/atualiza as tabelas automaticamente

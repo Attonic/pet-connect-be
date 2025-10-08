@@ -14,7 +14,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 public class UserController {
 
     private final UserService userService;
@@ -27,8 +27,9 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> findById(@PathVariable UUID id) {
-        UserDto userDto = userService.findById(id);
-        return ResponseEntity.ok(userDto);
+        return userService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping()
