@@ -27,6 +27,4 @@ public class AddressController {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressDto1);
     }
 
-
-
 }

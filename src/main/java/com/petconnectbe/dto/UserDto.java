@@ -2,6 +2,8 @@ package com.petconnectbe.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonFormat;             //incluida para adaptar formato de data
+import com.fasterxml.jackson.annotation.JsonProperty;           //incluida para corrigir endereco
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +32,7 @@ public class UserDto implements Serializable {
     private String phone;
 
     @NotNull(message = "A Data de Nascimento é Obrigatório.")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") //Permite ajustar formato da data
     private LocalDate birthOrFoundationDate;
 
     @NotBlank(message = "A Senha é Obrigatório.")
@@ -38,13 +41,11 @@ public class UserDto implements Serializable {
 
     @NotBlank(message = "O Endereço é Obrigatório.")
     @Valid
+    @JsonProperty("address")  //incluido
     private AddressDto endereco;
 
     @NotBlank(message = "A senha deve ser informada.")
     private String password;
-
-
-
 
 }
 

@@ -2,18 +2,14 @@ package com.petconnectbe.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.UUID;
 
 @Entity
@@ -21,7 +17,7 @@ import java.util.UUID;
 @Table(name = "user_tb")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User implements Serializable {
+public class User implements Serializable, UserDetails {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -31,7 +27,7 @@ public class User implements Serializable {
     @Column(name = "type", nullable = false, length = 30)
     private String type;
 
-    @Column(name = "name",nullable = false, length = 150)
+    @Column(name = "name", nullable = false, length = 150)
     private String name;
 
     @Column(name = "email", nullable = false, length = 254)
@@ -50,8 +46,37 @@ public class User implements Serializable {
     @JoinColumn(name = "adress_id")
     private Address address;
 
-    @Column(name = "passeord", length = 100)
+    @Column(name = "password", length = 100, nullable = false)
     private String password;
 
+    // Métodos da interface UserDetails (obrigatorios no Spring Security)
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null; // Por enquanto, não vamos usar papéis (roles), então retornamos null.
+    }
 
+    @Override
+    public String getUsername() {
+        return email; // O Spring Security vai usar o e-mail como nome de usuário.
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // A conta não expira.
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // A conta não está bloqueada.
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // As credenciais não expiram.
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // A conta está habilitada.
+    }
 }
