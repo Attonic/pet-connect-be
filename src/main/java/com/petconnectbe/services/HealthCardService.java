@@ -5,30 +5,30 @@ import com.petconnectbe.dto.HealthCardDto;
 public interface HealthCardService {
 
     /**
-     * Creates a new health card for a pet.
-     * @param healthCardDto The DTO containing the information of the new HealthCard.
-     * @return The DTO of the created HealthCard.
+     * Cria um novo cartão de saúde para um pet.
+     * @param healthCardDto O DTO contendo as informações do novo HealthCard.
+     * @return O DTO do HealthCard criado.
      */
     HealthCardDto createHealthCard(HealthCardDto healthCardDto);
 
     /**
-     * Retrieves the health card associated with a specific pet.
-     * @param petId The ID of the pet.
-     * @return The DTO of the found HealthCard.
+     * Recupera o cartão de saúde associado a um pet específico.
+     * @param petId O ID do pet.
+     * @return O DTO do HealthCard encontrado.
      */
     HealthCardDto getHealthCardByPetId(Integer petId);
 
     /**
-     * Updates the information of an existing health card.
-     * @param id The ID of the HealthCard to be updated.
-     * @param healthCardDto The DTO with the new information.
-     * @return The DTO of the updated HealthCard.
+     * Atualiza as informações de um cartão de saúde existente.
+     * @param id O ID do HealthCard a ser atualizado.
+     * @param healthCardDto O DTO com as novas informações.
+     * @return O DTO do HealthCard atualizado.
      */
     HealthCardDto updateHealthCard(Integer id, HealthCardDto healthCardDto);
 
     /**
-     * Deletes a health card by its ID.
-     * @param id The ID of the HealthCard to be deleted.
+     * Deleta um cartão de saúde pelo seu ID.
+     * @param id O ID do HealthCard a ser deletado.
      */
     void deleteHealthCard(Integer id);
 }
