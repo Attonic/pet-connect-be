@@ -23,11 +23,11 @@ public class HealthCardServiceImpl implements HealthCardService {
     @Transactional
     public HealthCardDto createHealthCard(HealthCardDto healthCardDto) {
         Pet pet = petRepository.findById(healthCardDto.getPetId())
-                .orElseThrow(() -> new RuntimeException("Pet not found with id: " + healthCardDto.getPetId()));
+                .orElseThrow(() -> new RuntimeException("Pet não encontrado com o id: " + healthCardDto.getPetId()));
 
-        // Check if the pet already has a health card
+        // Verifica se o pet já possui um cartão de saúde
         healthCardRepository.findByPetId(healthCardDto.getPetId()).ifPresent(hc -> {
-            throw new RuntimeException("This pet already has a HealthCard.");
+            throw new RuntimeException("Este pet já possui um HealthCard.");
         });
 
         HealthCard healthCard = new HealthCard();
@@ -45,20 +45,20 @@ public class HealthCardServiceImpl implements HealthCardService {
     public HealthCardDto getHealthCardByPetId(Integer petId) {
         return healthCardRepository.findByPetId(petId)
                 .map(this::toDto)
-                .orElseThrow(() -> new RuntimeException("HealthCard not found for pet with id: " + petId));
+                .orElseThrow(() -> new RuntimeException("HealthCard não encontrado para o pet com o id: " + petId));
     }
 
     @Override
     @Transactional
     public HealthCardDto updateHealthCard(Integer id, HealthCardDto healthCardDto) {
         HealthCard existingHealthCard = healthCardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("HealthCard not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("HealthCard não encontrado com o id: " + id));
 
-        // Update fields
+        // Atualiza os campos
         existingHealthCard.setAllergies(healthCardDto.getAllergies());
         existingHealthCard.setBloodType(healthCardDto.getBloodType());
 
-        // Save changes
+        // Salva as alterações
         HealthCard updatedHealthCard = healthCardRepository.save(existingHealthCard);
 
         return toDto(updatedHealthCard);
@@ -68,7 +68,7 @@ public class HealthCardServiceImpl implements HealthCardService {
     @Transactional
     public void deleteHealthCard(Integer id) {
         if (!healthCardRepository.existsById(id)) {
-            throw new RuntimeException("HealthCard not found with id: " + id);
+            throw new RuntimeException("HealthCard não encontrado com o id: " + id);
         }
         healthCardRepository.deleteById(id);
     }

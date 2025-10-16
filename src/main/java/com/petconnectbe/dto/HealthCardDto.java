@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * DTO for the HealthCard entity. Used to transfer HealthCard data between the frontend and the backend.
+ * DTO para a entidade HealthCard. Usado para transferir dados do HealthCard entre o frontend e o backend.
  */
 @Data
 public class HealthCardDto {
@@ -12,19 +12,19 @@ public class HealthCardDto {
     private Integer id;
 
     /**
-     * The ID of the Pet to which this health card is associated.
-     * This field is essential to link the HealthCard to the correct Pet when creating or updating.
+     * O ID do Pet ao qual este cartão de saúde está associado.
+     * Este campo é essencial para vincular o HealthCard ao Pet correto ao criar ou atualizar.
      */
-    @NotNull(message = "The pet ID is mandatory.")
+    @NotNull(message = "O ID do pet é obrigatório.")
     private Integer petId;
 
     /**
-     * Known allergies of the Pet.
+     * Alergias conhecidas do Pet.
      */
     private String allergies;
 
     /**
-     * The blood type of the Pet.
+     * O tipo sanguíneo do Pet.
      */
     private String bloodType;
 }

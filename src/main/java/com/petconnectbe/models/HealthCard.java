@@ -5,8 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Represents the health card of a Pet.
- * Each Pet has a single HealthCard associated with it.
+ * Representa o cartão de saúde de um Pet.
+ * Cada Pet possui um único HealthCard associado a ele.
  */
 @Entity
 @Table(name = "health_cards")
@@ -19,25 +19,25 @@ public class HealthCard {
     private Integer id;
 
     /**
-     * The Pet to which this health card belongs.
-     * The @OneToOne annotation establishes a one-to-one relationship with the Pet entity.
-     * `fetch = FetchType.LAZY`: The associated Pet will only be loaded from the database when accessed for the first time.
-     * `optional = false`: Ensures that a HealthCard cannot exist without an associated Pet.
-     * `@JoinColumn`: Specifies the foreign key column (pet_id) in the `health_cards` table.
+     * O Pet ao qual este cartão de saúde pertence.
+     * A anotação @OneToOne estabelece uma relação um-para-um com a entidade Pet.
+     * `fetch = FetchType.LAZY`: O Pet associado só será carregado do banco de dados quando for acessado pela primeira vez.
+     * `optional = false`: Garante que um HealthCard não pode existir sem um Pet associado.
+     * `@JoinColumn`: Especifica a coluna de chave estrangeira (pet_id) na tabela `health_cards`.
      */
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "pet_id", referencedColumnName = "id", unique = true)
     private Pet pet;
 
     /**
-     * Known allergies of the Pet (free text).
-     * Ex: "Pollen, Fleas, some types of grains".
+     * Alergias conhecidas do Pet (texto livre).
+     * Ex: "Pólen, Pulgas, alguns tipos de grãos".
      */
     private String allergies;
 
     /**
-     * The blood type of the Pet.
-     * Ex: "DEA 1.1 Positive".
+     * O tipo sanguíneo do Pet.
+     * Ex: "DEA 1.1 Positivo".
      */
     private String bloodType;
 }

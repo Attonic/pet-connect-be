@@ -7,17 +7,17 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * Repository for the HealthCard entity.
- * Provides methods to perform database operations for the HealthCard entity.
+ * Repositório para a entidade HealthCard.
+ * Fornece métodos para realizar operações de banco de dados para a entidade HealthCard.
  */
 @Repository
 public interface HealthCardRepository extends JpaRepository<HealthCard, Integer> {
 
     /**
-     * Finds a HealthCard by the ID of the associated Pet.
-     * Spring Data JPA automatically creates the implementation of this method.
-     * @param petId The ID of the pet.
-     * @return An Optional containing the HealthCard if found, otherwise empty.
+     * Encontra um HealthCard pelo ID do Pet associado.
+     * O Spring Data JPA cria automaticamente a implementação deste método.
+     * @param petId O ID do pet.
+     * @return Um Optional contendo o HealthCard se encontrado, caso contrário, vazio.
      */
     Optional<HealthCard> findByPetId(Integer petId);
 }
