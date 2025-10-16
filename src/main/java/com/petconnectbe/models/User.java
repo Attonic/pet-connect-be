@@ -45,6 +45,13 @@ public class User implements Serializable {
     private String name;
 
     /**
+     * Sobrenome do usuário (relevante para tutores).
+     * Campo opcional.
+     */
+    @Column(name = "lastname", length = 150)
+    private String lastname;
+
+    /**
      * Endereço de e-mail do usuário.
      * Utilizado para login e comunicação. Deve ser único. Campo obrigatório.
      */
