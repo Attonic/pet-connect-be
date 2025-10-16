@@ -1,1 +1,33 @@
-*.md
+# Maven build output
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Logs
+*.log
+app.log
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+
+# Environment files
+.env
+
+# Project IDX folder
+.idx/
+
+# Custom folders to ignore
+_aleatorios/
+pet-connect-fe/
+
+# Other files
+*.pdf

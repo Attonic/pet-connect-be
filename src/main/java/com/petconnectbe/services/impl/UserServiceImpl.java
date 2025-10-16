@@ -86,8 +86,8 @@ public class UserServiceImpl implements UserService {
             user.setPassword(userDto.getPassword());
         }
 
-        if (userDto.getEndereco() != null) {
-            user.setAddress(addressService.toEntity(userDto.getEndereco()));
+        if (userDto.getAddress() != null) {
+            user.setAddress(addressService.toEntity(userDto.getAddress()));
         } else {
             user.setAddress(null);
         }
@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(user, dto, "password"); // Nunca expor a senha
 
         if (user.getAddress() != null) {
-            dto.setEndereco(addressService.toDto(user.getAddress()));
+            dto.setAddress(addressService.toDto(user.getAddress()));
         }
         return dto;
     }
@@ -130,8 +130,8 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         BeanUtils.copyProperties(dto, user);
 
-        if (dto.getEndereco() != null) {
-            user.setAddress(addressService.toEntity(dto.getEndereco()));
+        if (dto.getAddress() != null) {
+            user.setAddress(addressService.toEntity(dto.getAddress()));
         }
         return user;
     }
