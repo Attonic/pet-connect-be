@@ -1,3 +1,4 @@
+
 package com.petconnectbe.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -69,7 +70,7 @@ public class User implements Serializable {
      * Data de nascimento (para pessoa física) ou data de fundação (para pessoa jurídica).
      * Campo obrigatório.
      */
-    @Column(name = "birth_foundation_date", nullable = false)
+    @Column(name = "birth_foundation_date", nullable = true)
     private LocalDate birthOrFoundationDate;
 
     /**

@@ -16,12 +16,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Implementação do serviço {@link UserService} para gerenciar os dados dos Usuários.
- * <p>
- * Esta classe gerencia a lógica de negócio para as operações de CRUD de usuários,
- * validando dados, tratando exceções e interagindo com a camada de persistência.
- */
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -29,11 +23,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AddressService addressService;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws IllegalArgumentException se o email fornecido já existir no sistema.
-     */
     @Override
     @Transactional
     public UserDto save(UserDto userDto) {
@@ -47,18 +36,12 @@ public class UserServiceImpl implements UserService {
         return toDto(savedUser);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly = true)
     public Optional<UserDto> findById(UUID id) {
         return userRepository.findById(id).map(this::toDto);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> findAll() {
@@ -68,18 +51,12 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList());
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws EntityNotFoundException se nenhum usuário for encontrado com o ID fornecido.
-     */
     @Override
     @Transactional
     public UserDto update(UUID id, UserDto userDto) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o ID: " + id));
 
-        // Atualiza os campos do usuário
         BeanUtils.copyProperties(userDto, user, "id", "password", "email");
 
         if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
@@ -96,11 +73,6 @@ public class UserServiceImpl implements UserService {
         return toDto(updatedUser);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws EntityNotFoundException se nenhum usuário for encontrado com o ID fornecido.
-     */
     @Override
     @Transactional
     public void deleteById(UUID id) {
@@ -109,13 +81,25 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.deleteById(id);
     }
+    
+    @Override
+    @Transactional
+    public UserDto updateUserLastname(UUID id, String lastname) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o ID: " + id));
+
+        user.setLastname(lastname);
+
+        User updatedUser = userRepository.save(user);
+        return toDto(updatedUser);
+    }
 
     private UserDto toDto(User user) {
         if (user == null) {
             return null;
         }
         UserDto dto = new UserDto();
-        BeanUtils.copyProperties(user, dto, "password"); // Nunca expor a senha
+        BeanUtils.copyProperties(user, dto, "password");
 
         if (user.getAddress() != null) {
             dto.setAddress(addressService.toDto(user.getAddress()));
