@@ -1,0 +1,54 @@
+# Relatório de Testes da API - PetConnect
+
+**Data:** 25/05/2024
+
+**Autor:** Marcelo (com suporte do Gemini)
+
+**Objetivo:** Realizar testes de ponta-a-ponta nos controllers `UserController` e `PetController` para validar as funcionalidades de CRUD e investigar o estado do upload de imagens.
+
+---
+
+### Sumário Executivo
+
+Todos os endpoints de CRUD dos controllers `User` e `Pet` foram testados com sucesso. Um bug no endpoint de atualização de usuário foi corrigido. A descoberta mais importante é que a **funcionalidade de upload de imagem para pets está atualmente implementada como um mock**, ou seja, ela simula o comportamento mas não armazena o arquivo de fato. A API está estável para operações de dados, mas a funcionalidade de arquivo precisará de uma implementação real para produção.
+
+---
+
+### Resultados Detalhados
+
+#### 1. UserController
+
+O CRUD para a entidade `User` foi completamente testado e está 100% funcional.
+
+*   **`POST /users`**: OK
+*   **`GET /users`**: OK
+*   **`GET /users/{id}`**: OK
+*   **`PUT /users/{id}`**: 
+    *   **Problema:** Um bug impedia a atualização de usuários.
+    *   **Solução:** O código do `UserService.java` foi corrigido.
+    *   **Resultado:** OK
+*   **`DELETE /users/{id}`**: OK
+
+#### 2. PetController
+
+O CRUD para a entidade `Pet` foi testado com os seguintes resultados:
+
+*   **Operações de Dados (JSON):**
+    *   `POST /pets`, `GET /pets`, `GET /pets/{id}`, `PUT /pets/{id}`, `DELETE /pets/{id}` estão todos **OK** para a manipulação dos dados do pet.
+
+*   **Upload de Imagem (`MultipartFile`):
+    *   **Análise:** O código da API está preparado para receber um arquivo de imagem.
+    *   **Descoberta:** A implementação atual (`FileStorageServiceImpl`) é um **mock para desenvolvimento**. Ela não salva o arquivo fisicamente. Em vez disso, gera uma URL falsa e a salva no banco de dados, retornando sucesso.
+    *   **Conclusão:** O fluxo da API para upload de imagem funciona, mas a funcionalidade de armazenamento precisa ser substituída por uma solução de produção (ex: salvar em disco, Amazon S3, etc.).
+
+#### 3. AddressController
+
+A funcionalidade de endereço foi validada indiretamente através dos testes do `UserController` e está funcionando.
+
+---
+
+### Conclusão e Recomendações
+
+A sessão de testes foi um sucesso. As funcionalidades de dados da API estão robustas. 
+
+A principal recomendação é a **criação de uma task para implementar o armazenamento de arquivos real**, substituindo o mock atual. Esta é uma pendência crítica para que a funcionalidade de imagem do pet seja considerada completa.
