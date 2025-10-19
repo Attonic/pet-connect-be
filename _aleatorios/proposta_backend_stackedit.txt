@@ -1,0 +1,214 @@
+# Documentação da API de Usuários (Visão do Backend)
+
+**Status:** Para revisão
+**Foco:** Alinhamento técnico
+
+---
+
+## 1. Introdução
+
+Este documento funciona como um **guia de referência** para o time de backend e um **ponto de alinhamento** com o time de frontend. A ideia é registrar a arquitetura atual, organizar os próximos passos e alinhar as expectativas para o MVP.
+
+---
+
+## 2. Arquitetura do Backend
+
+A arquitetura do nosso backend já segue um padrão de **camadas, inspirado no MVC (Model-View-Controller)**. A principal característica dessa abordagem é a separação de responsabilidades, onde o backend atua como **Model e Controller**, expondo dados através de uma API REST, enquanto a **View** é uma responsabilidade do frontend (React).
+
+O modelo de dados implementado para o MVP está representado assim:
+
+```mermaid
+graph LR
+    U[Usuario] -- Possui 1:1 --> E[Endereço]
+```
+
+---
+
+## 3. Próximo Passo (Backend)
+
+A prioridade máxima agora é **finalizar e entregar o endpoint `POST /register`**.
+
+Esse endpoint seguirá o padrão de camadas já definido e deve aceitar um DTO (Data Transfer Object) no seguinte formato:
+
+| Campo      | Tipo     | Exemplo               | Obrigatório |
+| :--------- | :------- | :-------------------- | :---------: |
+| `name`     | `String` | `"Maria da Silva"`    |      ✅      |
+| `phone`    | `String` | `"(11) 99999-8888"`   |      ✅      |
+| `email`    | `String` | `"usuario@email.com"` |      ✅      |
+| `password` | `String` | `"senhaForte123"`     |      ✅      |
+| `address`  | `Object` | *(detalhes abaixo)*   |      ✅      |
+
+**Objeto `address` aninhado:**
+
+| Campo          | Tipo     | Exemplo           | Obrigatório |
+| :------------- | :------- | :---------------- | :---------: |
+| `cep`          | `String` | `"01001-000"`     |      ✅      |
+| `street`       | `String` | `"Rua Exemplo"`   |      ✅      |
+| `neighborhood` | `String` | `"Bairro Modelo"` |      ✅      |
+| `city`         | `String` | `"São Paulo"`     |      ✅      |
+| `uf`           | `String` | `"SP"`            |      ✅      |
+
+---
+
+## 4. Alinhamento com o Frontend
+
+Sabendo que o time de frontend já possui a **tela de login funcional**, o próximo passo do backend é desbloquear o desenvolvimento da **tela de cadastro**. Para isso, a entrega do endpoint `POST /register` é a nossa prioridade de alinhamento.
+
+---
+
+## 5. Evoluções Pós-MVP
+
+Com o cadastro em produção, o plano é expandir o modelo para suportar as funcionalidades centrais da aplicação.
+
+#### 5.1. Especialização dos Usuários
+
+A entidade `User` será evoluída para os tipos `Tutor`, `ONG` e `Clínica` usando Herança.
+
+```mermaid
+graph LR
+    subgraph Entidades
+        U[Usuario] -- Herda --> T[Tutor]
+        U -- Herda --> O[ONG]
+        U -- Herda --> C[Clínica]
+        U -- Possui 1:1 --> E[Endereço]
+    end
+```
+
+#### 5.2. Fluxo de Cadastro de Pet
+
+O primeiro passo é permitir que um Tutor (usuário) cadastre um novo animal de estimação.
+
+##### 5.2.1. Endpoint
+
+*   Verbo: POST
+*   Caminho: /pets
+*   Descrição: Cria um novo registro de Pet associado ao Tutor logado.
+
+##### 5.2.2. DTO: PetDTO.java
+
+| Campo     | Tipo     | Exemplo             | Obrigatório |
+| :-------- | :------- | :------------------ | :---------: |
+| tutorId | UUID     | "uuid-do-tutor"   |      ✅      |
+| nome    | String   | "Bolinha"         |      ✅      |
+| especie | String   | "Cachorro"        |      ✅      |
+| raca    | String   | "Vira-lata"       |      ✅      |
+
+##### 5.2.3. Controller: PetController.java
+
+```java
+@RestController
+@RequestMapping("/pets")
+public class PetController {
+
+    @Autowired
+    private PetService petService;
+
+    @PostMapping
+    public ResponseEntity<Pet> createPet(@RequestBody PetDTO petDto) {
+        Pet novoPet = petService.create(petDto);
+        return new ResponseEntity<>(novoPet, HttpStatus.CREATED);
+    }
+}
+```
+
+##### 5.2.4. Service: PetService.java
+
+```java
+@Service
+public class PetService {
+
+    @Autowired
+    private PetRepository petRepository;
+
+    @Autowired
+    private TutorRepository tutorRepository;
+
+    public Pet create(PetDTO petDto) {
+        Tutor tutor = tutorRepository.findById(petDto.getTutorId())
+            .orElseThrow(() -> new RuntimeException("Tutor não encontrado!"));
+        Pet pet = new Pet();
+        pet.setNome(petDto.getNome());
+        pet.setEspecie(petDto.getEspecie());
+        pet.setRaca(petDto.getRaca());
+        pet.setTutor(tutor);
+        return petRepository.save(pet);
+    }
+}
+```
+
+#### 5.3. Fluxo de Cadastro de Carteirinha de Vacinação
+
+Uma vez que o Pet existe, é possível criar e associar sua carteirinha de vacinação.
+
+##### 5.3.1. Endpoint
+
+*   Verbo: POST
+*   Caminho: /pets/{petId}/vaccination-card
+*   Descrição: Cria uma carteirinha de vacinação para um Pet específico.
+
+##### 5.3.2. DTO: VaccinationCardDTO.java
+
+| Campo          | Tipo            | Exemplo                     | Obrigatório |
+| :------------- | :-------------- | :-------------------------- | :---------: |
+| dataEmissao  | Date            | "2024-05-21"              |      ✅      |
+| vacinas      | List<String>    | ["Raiva", "V10"]        |      ❌      |
+
+##### 5.3.3. Controller: VaccinationCardController.java
+
+```java
+@RestController
+@RequestMapping("/pets/{petId}/vaccination-card")
+public class VaccinationCardController {
+
+    @Autowired
+    private VaccinationCardService cardService;
+
+    @PostMapping
+    public ResponseEntity<Carteirinha> createCard(@PathVariable UUID petId, @RequestBody VaccinationCardDTO cardDto) {
+        Carteirinha novaCarteirinha = cardService.create(petId, cardDto);
+        return new ResponseEntity<>(novaCarteirinha, HttpStatus.CREATED);
+    }
+}
+```
+
+##### 5.3.4. Service: VaccinationCardService.java
+
+```java
+@Service
+public class VaccinationCardService {
+
+    @Autowired
+    private VaccinationCardRepository cardRepository;
+
+    @Autowired
+    private PetRepository petRepository;
+
+    public Carteirinha create(UUID petId, VaccinationCardDTO cardDto) {
+        Pet pet = petRepository.findById(petId)
+            .orElseThrow(() -> new RuntimeException("Pet não encontrado!"));
+        Carteirinha carteirinha = new Carteirinha();
+        carteirinha.setDataEmissao(cardDto.getDataEmissao());
+        carteirinha.setVacinas(cardDto.getVacinas());
+        carteirinha.setPet(pet);
+        return cardRepository.save(carteirinha);
+    }
+}
+```
+
+---
+
+## 6. Visão Final do Modelo de Dados (Cenário Ideal)
+
+O diagrama abaixo representa o cenário ideal para o modelo de dados, unindo todas as entidades e seus relacionamentos planejados, servindo como um mapa para a evolução do projeto.
+
+```mermaid
+graph TD
+    subgraph Relacionamentos
+        U[Usuario] -- "1..1" --> E[Endereço]
+        U -- Herda --> T[Tutor]
+        U -- Herda --> O[ONG]
+        U -- Herda --> C[Clínica]
+        T -- "1..n" --> P[Pet]
+        P -- "1..1" --> CV[Carteirinha de Vacinação]
+    end
+```
