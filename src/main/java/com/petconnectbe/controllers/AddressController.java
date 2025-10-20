@@ -7,13 +7,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/addresses")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 public class AddressController {
 
     private final AddressService addressService;
@@ -32,7 +33,8 @@ public class AddressController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AddressDto> findById(@PathVariable UUID id){
-        AddressDto addressDto = addressService.findById(id);
-        return ResponseEntity.ok(addressDto);
+        return addressService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
