@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/addresses")
+@RequestMapping("/api/v1/addresses")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 public class AddressController {
