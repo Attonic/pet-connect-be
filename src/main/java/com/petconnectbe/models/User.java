@@ -1,3 +1,4 @@
+
 package com.petconnectbe.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -45,6 +46,13 @@ public class User implements Serializable {
     private String name;
 
     /**
+     * Sobrenome do usuário (relevante para tutores).
+     * Campo opcional.
+     */
+    @Column(name = "lastname", length = 150)
+    private String lastname;
+
+    /**
      * Endereço de e-mail do usuário.
      * Utilizado para login e comunicação. Deve ser único. Campo obrigatório.
      */
@@ -62,7 +70,7 @@ public class User implements Serializable {
      * Data de nascimento (para pessoa física) ou data de fundação (para pessoa jurídica).
      * Campo obrigatório.
      */
-    @Column(name = "birth_foundation_date", nullable = false)
+    @Column(name = "birth_foundation_date", nullable = true)
     private LocalDate birthOrFoundationDate;
 
     /**

@@ -2,43 +2,56 @@ package com.petconnectbe.services.impl;
 
 import com.petconnectbe.services.FileStorageService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Implementação <strong>simulada</strong> do serviço
- * {@link FileStorageService}.
- * <p>
- * <strong>ATENÇÃO:</strong> Esta é uma implementação para fins de
- * desenvolvimento e teste.
- * Ela não armazena fisicamente os arquivos, apenas simula o processo e retorna
- * um caminho fictício.
- * Em um ambiente de produção, esta classe deve ser substituída por uma
- * implementação real
- * que salve os arquivos em um sistema de armazenamento persistente (ex: Amazon
- * S3, Google Cloud Storage, ou disco local).
- */
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Esta implementação simulada gera um nome de arquivo único e imprime o nome do
-     * arquivo original no console para fins de depuração. O caminho retornado é um
-     * caminho fictício que pode ser usado pelo front-end para exibir imagens de
-     * exemplo.
-     */
+    private final Path rootLocation = Paths.get("uploads");
+
+    public FileStorageServiceImpl() {
+        try {
+            Files.createDirectories(rootLocation);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not initialize storage", e);
+        }
+    }
+
     @Override
     public String store(MultipartFile file) {
-        // Simula o log do armazenamento do arquivo
-        System.out.println("Simulando o armazenamento do arquivo: " + file.getOriginalFilename());
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
 
-        // Gera um nome de arquivo único para evitar conflitos
-        String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+        String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
-        // Retorna um caminho fictício que o front-end pode usar para exibir uma imagem
-        // de exemplo
-        return "/static/images/pets/" + fileName;
+        try {
+            if (originalFilename.contains("..")) {
+                throw new RuntimeException("Cannot store file with relative path outside current directory " + originalFilename);
+            }
+
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String filename = UUID.randomUUID().toString() + extension;
+
+            Path destinationFile = this.rootLocation.resolve(Paths.get(filename))
+                .normalize().toAbsolutePath();
+
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            return "/images/" + filename;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file " + originalFilename, e);
+        }
     }
 }
