@@ -13,3 +13,6 @@ target/
 
 # Arquivo de variáveis de ambiente
 .env
+
+# Arquivos de documentação
+*.md
