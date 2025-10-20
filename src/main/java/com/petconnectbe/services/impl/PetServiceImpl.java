@@ -14,15 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Implementação do serviço {@link PetService} para gerenciar os dados dos Pets.
- * <p>
- * Esta classe orquestra as operações de negócio relacionadas a pets, como a
- * criação,
- * interagindo com os repositórios e outros serviços (como o
- * {@link FileStorageService})
- * para cumprir suas responsabilidades.
- */
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class PetServiceImpl implements PetService {
@@ -31,11 +26,6 @@ public class PetServiceImpl implements PetService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws EntityNotFoundException se o tutor (usuário) não for encontrado.
-     */
     @Override
     @Transactional
     public PetDto createPet(PetDto petDto, MultipartFile image) {
@@ -54,9 +44,56 @@ public class PetServiceImpl implements PetService {
         return toDto(savedPet);
     }
 
-    /**
-     * Converte uma entidade {@link Pet} para seu respectivo {@link PetDto}.
-     */
+    @Override
+    @Transactional
+    public PetDto updatePetImage(Integer id, MultipartFile image) {
+        Pet pet = petRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Pet não encontrado com o ID: " + id));
+
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = fileStorageService.store(image);
+            pet.setImageUrl(imageUrl);
+        }
+
+        Pet updatedPet = petRepository.save(pet);
+        return toDto(updatedPet);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PetDto> findById(Integer id) {
+        return petRepository.findById(id).map(this::toDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PetDto> findAll() {
+        return petRepository.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public PetDto update(Integer id, PetDto petDto) {
+        Pet existingPet = petRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pet não encontrado com o ID: " + id));
+
+        BeanUtils.copyProperties(petDto, existingPet, "id", "tutorId", "imageUrl");
+
+        Pet updatedPet = petRepository.save(existingPet);
+        return toDto(updatedPet);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Integer id) {
+        if (!petRepository.existsById(id)) {
+            throw new EntityNotFoundException("Pet não encontrado com o ID: " + id);
+        }
+        petRepository.deleteById(id);
+    }
+
     private PetDto toDto(Pet pet) {
         if (pet == null) {
             return null;
@@ -64,22 +101,16 @@ public class PetServiceImpl implements PetService {
         PetDto dto = new PetDto();
         BeanUtils.copyProperties(pet, dto);
         if (pet.getTutor() != null) {
-            // No DTO, nós definimos apenas o ID do tutor.
             dto.setTutorId(pet.getTutor().getId());
         }
         return dto;
     }
 
-    /**
-     * Converte um {@link PetDto} para sua respectiva entidade {@link Pet}.
-     */
     private Pet toEntity(PetDto dto) {
         if (dto == null) {
             return null;
         }
         Pet pet = new Pet();
-        // 
-        // Copia as propriedades, mas ignora o tutorId, pois ele será tratado separadamente.
         BeanUtils.copyProperties(dto, pet, "tutorId");
         return pet;
     }
