@@ -9,14 +9,16 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDto implements Serializable {
+    
+    private UUID userId;
 
     @NotBlank(message = "O tipo do Usuário deve ser informado.")
     private String type;
@@ -39,7 +41,7 @@ public class UserDto implements Serializable {
     private String cpfOrCnpj;
 
 
-    @NotBlank(message = "O Endereço é Obrigatório.")
+    @NotNull(message = "O Endereço é Obrigatório.")
     @Valid
     @JsonProperty("address")  //incluido
     private AddressDto endereco;

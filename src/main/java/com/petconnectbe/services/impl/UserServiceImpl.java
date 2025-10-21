@@ -65,6 +65,16 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public UserDto update(UUID id, UserDto userDto) {
+        return null;
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+
+    }
+
     public UserDto toDto(User user) {
         UserDto userDto = new UserDto();
 
