@@ -1,5 +1,6 @@
 package com.petconnectbe.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,16 +8,18 @@ import java.util.UUID;
 
 /**
  * DTO (Data Transfer Object) para dados de Pet.
- * Usado para transferir informações de pets entre a camada de controle e os clientes (ex: frontend).
- * O Lombok @Data gera automaticamente getters, setters, toString, equals e hashCode.
- * O Lombok @NoArgsConstructor gera um construtor sem argumentos.
+ * Usado para transferir informações de pets entre a camada de controle e os clientes.
+ * Esta versão é projetada para suportar uma estrutura polimórfica (Dog, Cat, etc.).
+ * A anotação @JsonInclude(JsonInclude.Include.NON_NULL) garante que campos nulos
+ * (como 'size' para um gato) não sejam incluídos na resposta JSON.
  */
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PetDto {
 
     /**
-     * O identificador único do pet. Gerado pelo banco de dados.
+     * O identificador único do pet.
      */
     private Integer id;
 
@@ -31,14 +34,10 @@ public class PetDto {
     private String name;
 
     /**
-     * A espécie do pet (ex: Cachorro, Gato).
+     * O tipo de pet (ex: "DOG", "CAT"). Este campo é usado como discriminador
+     * para determinar a classe de entidade concreta a ser usada.
      */
-    private String species;
-
-    /**
-     * A raça ou raças do pet.
-     */
-    private String races;
+    private String petType;
 
     /**
      * O peso do pet em quilogramas.
@@ -66,7 +65,27 @@ public class PetDto {
     private String about;
 
     /**
-     * A URL da imagem do pet. Este campo é populado pelo backend após o upload.
+     * A URL da imagem do pet.
      */
     private String imageUrl;
+
+    // Campos específicos para Dog e Cat
+    /**
+     * A raça do pet. Comum a Dog e Cat.
+     */
+    private String breed;
+
+    // Campos específicos para Dog
+    /**
+     * O porte do cachorro (ex: "Pequeno", "Médio", "Grande").
+     * Específico para a classe Dog.
+     */
+    private String size;
+
+    // Campos específicos para Cat
+    /**
+     * O tipo de pelagem do gato (ex: "Curto", "Longo").
+     * Específico para a classe Cat.
+     */
+    private String coatType;
 }
