@@ -8,12 +8,15 @@ import lombok.NoArgsConstructor;
  * Entidade JPA que representa um Pet no banco de dados.
  * Mapeada para a tabela "pets". Contém todas as informações
  * relevantes sobre o animal de estimação.
+ * Esta é uma classe base abstrata para uma estratégia de herança polimórfica.
  */
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "pets")
-public class Pet {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "pet_type", discriminatorType = DiscriminatorType.STRING)
+public abstract class Pet {
 
     /**
      * Chave primária da entidade Pet.
@@ -28,16 +31,6 @@ public class Pet {
      */
     @Column(nullable = false)
     private String name;
-
-    /**
-     * Espécie do pet (ex: "Cachorro", "Gato", "Coelho").
-     */
-    private String species;
-
-    /**
-     * Raça do pet.
-     */
-    private String races;
 
     /**
      * Peso do pet, geralmente em quilogramas.
