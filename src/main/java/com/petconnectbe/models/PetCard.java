@@ -3,6 +3,8 @@ package com.petconnectbe.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representa o cartão de um Pet, chamado de PetCard.
@@ -42,4 +44,14 @@ public class PetCard {
      */
     @Column(columnDefinition = "TEXT")
     private String healthConditions;
+
+    /**
+     * Lista de vacinas associadas a este PetCard.
+     * - @OneToMany: Define a relação um-para-muitos (um PetCard para muitas Vacinas).
+     * - mappedBy = "petCard": Indica que o lado "muitos" (Vaccine) é o dono da relação.
+     * - cascade = CascadeType.ALL: Operações de persistência no PetCard são aplicadas às vacinas.
+     * - orphanRemoval = true: Se uma vacina é removida da lista, ela é excluída do banco.
+     */
+    @OneToMany(mappedBy = "petCard", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Vaccine> vaccines = new ArrayList<>();
 }

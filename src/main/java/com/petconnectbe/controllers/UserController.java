@@ -46,12 +46,6 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    @PatchMapping("/{id}/lastname")
-    public ResponseEntity<UserDto> updateUserLastname(@PathVariable UUID id, @RequestBody UserDto userDto) {
-        UserDto updatedUser = userService.updateUserLastname(id, userDto.getLastname());
-        return ResponseEntity.ok(updatedUser);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
                 userService.deleteById(id);

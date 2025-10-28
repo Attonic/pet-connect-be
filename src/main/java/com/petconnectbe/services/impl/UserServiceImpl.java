@@ -1,6 +1,9 @@
 package com.petconnectbe.services.impl;
 
 import com.petconnectbe.dto.UserDto;
+import com.petconnectbe.models.Clinica;
+import com.petconnectbe.models.Ong;
+import com.petconnectbe.models.Tutor;
 import com.petconnectbe.models.User;
 import com.petconnectbe.repositories.UserRepository;
 import com.petconnectbe.services.AddressService;
@@ -32,6 +35,10 @@ public class UserServiceImpl implements UserService {
 
         User user = toEntity(userDto);
 
+        // A senha deve ser criptografada antes de salvar.
+        // Adicionar lógica de criptografia de senha aqui (ex: BCryptPasswordEncoder)
+        // user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
         User savedUser = userRepository.save(user);
         return toDto(savedUser);
     }
@@ -46,20 +53,37 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public List<UserDto> findAll() {
         return userRepository.findAll()
-            .stream()
-            .map(this::toDto)
-            .collect(Collectors.toList());
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public UserDto update(UUID id, UserDto userDto) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o ID: " + id));
 
-        BeanUtils.copyProperties(userDto, user, "id", "password", "email");
+        // Copia propriedades comuns
+        BeanUtils.copyProperties(userDto, user, "id", "password", "email", "cpfOrCnpj", "birthOrFoundationDate");
+
+        // Atualiza campos específicos baseados no tipo da entidade
+        if (user instanceof Tutor) {
+            Tutor tutor = (Tutor) user;
+            tutor.setCpf(userDto.getCpfOrCnpj());
+            tutor.setBirthDate(userDto.getBirthOrFoundationDate());
+        } else if (user instanceof Ong) {
+            Ong ong = (Ong) user;
+            ong.setCnpj(userDto.getCpfOrCnpj());
+            ong.setFoundationDate(userDto.getBirthOrFoundationDate());
+        } else if (user instanceof Clinica) {
+            Clinica clinica = (Clinica) user;
+            clinica.setCnpj(userDto.getCpfOrCnpj());
+            clinica.setFoundationDate(userDto.getBirthOrFoundationDate());
+        }
 
         if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+            // Adicionar lógica de criptografia de senha aqui
             user.setPassword(userDto.getPassword());
         }
 
@@ -81,25 +105,32 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.deleteById(id);
     }
-    
-    @Override
-    @Transactional
-    public UserDto updateUserLastname(UUID id, String lastname) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o ID: " + id));
-
-        user.setLastname(lastname);
-
-        User updatedUser = userRepository.save(user);
-        return toDto(updatedUser);
-    }
 
     private UserDto toDto(User user) {
         if (user == null) {
             return null;
         }
         UserDto dto = new UserDto();
+        // Copia propriedades comuns
         BeanUtils.copyProperties(user, dto, "password");
+
+        // Define tipo e campos específicos
+        if (user instanceof Tutor) {
+            Tutor tutor = (Tutor) user;
+            dto.setType("TUTOR");
+            dto.setCpfOrCnpj(tutor.getCpf());
+            dto.setBirthOrFoundationDate(tutor.getBirthDate());
+        } else if (user instanceof Ong) {
+            Ong ong = (Ong) user;
+            dto.setType("ONG");
+            dto.setCpfOrCnpj(ong.getCnpj());
+            dto.setBirthOrFoundationDate(ong.getFoundationDate());
+        } else if (user instanceof Clinica) {
+            Clinica clinica = (Clinica) user;
+            dto.setType("CLINICA");
+            dto.setCpfOrCnpj(clinica.getCnpj());
+            dto.setBirthOrFoundationDate(clinica.getFoundationDate());
+        }
 
         if (user.getAddress() != null) {
             dto.setAddress(addressService.toDto(user.getAddress()));
@@ -108,11 +139,38 @@ public class UserServiceImpl implements UserService {
     }
 
     private User toEntity(UserDto dto) {
-        if (dto == null) {
-            return null;
+        if (dto == null || dto.getType() == null) {
+            throw new IllegalArgumentException("UserDto ou tipo de usuário não pode ser nulo");
         }
-        User user = new User();
-        BeanUtils.copyProperties(dto, user);
+
+        User user;
+        String type = dto.getType().toUpperCase();
+
+        switch (type) {
+            case "TUTOR":
+                Tutor tutor = new Tutor();
+                tutor.setCpf(dto.getCpfOrCnpj());
+                tutor.setBirthDate(dto.getBirthOrFoundationDate());
+                user = tutor;
+                break;
+            case "ONG":
+                Ong ong = new Ong();
+                ong.setCnpj(dto.getCpfOrCnpj());
+                ong.setFoundationDate(dto.getBirthOrFoundationDate());
+                user = ong;
+                break;
+            case "CLINICA":
+                Clinica clinica = new Clinica();
+                clinica.setCnpj(dto.getCpfOrCnpj());
+                clinica.setFoundationDate(dto.getBirthOrFoundationDate());
+                user = clinica;
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo de usuário desconhecido: " + dto.getType());
+        }
+
+        // Copia propriedades comuns do DTO para a entidade
+        BeanUtils.copyProperties(dto, user, "id", "cpfOrCnpj", "birthOrFoundationDate");
 
         if (dto.getAddress() != null) {
             user.setAddress(addressService.toEntity(dto.getAddress()));
