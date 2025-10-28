@@ -1,4 +1,3 @@
-
 package com.petconnectbe.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -7,20 +6,22 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * Entidade JPA que representa um Usuário no banco de dados.
- * Pode ser tanto uma pessoa física (tutor) quanto uma pessoa jurídica (abrigo).
- * Mapeada para a tabela "user_tb".
+ * Entidade JPA que representa a classe base para um Usuário no banco de dados.
+ * Esta é uma classe abstrata que utiliza a estratégia de herança SINGLE_TABLE.
+ * Todos os tipos de usuários (Tutor, Ong, Clinica) serão armazenados na tabela "user_tb",
+ * e uma coluna "user_type" irá diferenciar o tipo de cada registro.
  */
 @Entity
 @Data
 @Table(name = "user_tb")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User implements Serializable {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
+public abstract class User implements Serializable {
 
     /**
      * Chave primária da entidade Usuário.
@@ -32,25 +33,11 @@ public class User implements Serializable {
     private UUID id;
 
     /**
-     * Tipo de usuário (ex: "TUTOR", "ABRIGO").
-     * Campo obrigatório para diferenciar os tipos de conta.
-     */
-    @Column(name = "type", nullable = false, length = 30)
-    private String type;
-
-    /**
-     * Nome completo do usuário ou razão social do abrigo.
+     * Nome completo do usuário ou razão social da pessoa jurídica.
      * Campo obrigatório.
      */
     @Column(name = "name", nullable = false, length = 150)
     private String name;
-
-    /**
-     * Sobrenome do usuário (relevante para tutores).
-     * Campo opcional.
-     */
-    @Column(name = "lastname", length = 150)
-    private String lastname;
 
     /**
      * Endereço de e-mail do usuário.
@@ -67,25 +54,8 @@ public class User implements Serializable {
     private String phone;
 
     /**
-     * Data de nascimento (para pessoa física) ou data de fundação (para pessoa jurídica).
-     * Campo obrigatório.
-     */
-    @Column(name = "birth_foundation_date", nullable = true)
-    private LocalDate birthOrFoundationDate;
-
-    /**
-     * Cadastro de Pessoa Física (CPF) ou Cadastro Nacional da Pessoa Jurídica (CNPJ).
-     * O formato esperado é "xxx.xxx.xxx-xx" para CPF e "xx.xxx.xxx/xxxx-xx" para CNPJ.
-     * Deve ser único. Campo obrigatório.
-     */
-    @Column(name = "cpf_cnpj", nullable = false, unique = true, length = 18)
-    private String cpfOrCnpj;
-
-    /**
      * Relacionamento Um-para-Um com a entidade Address.
-     * - `cascade = CascadeType.ALL`: Operações de persistência, atualização e remoção
-     *   no usuário serão cascateadas para o endereço associado.
-     * - `@JoinColumn`: Especifica a chave estrangeira na tabela de usuários.
+     * - `cascade = CascadeType.ALL`: Operações no usuário serão cascateadas para o endereço.
      */
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")

@@ -17,6 +17,4 @@ public interface UserService {
 
     void deleteById(UUID id);
 
-    UserDto updateUserLastname(UUID id, String lastname);
-
 }
