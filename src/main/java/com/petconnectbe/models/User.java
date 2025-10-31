@@ -10,16 +10,16 @@ import java.util.UUID;
 
 /**
  * Entidade JPA que representa a classe base para um Usuário no banco de dados.
- * Esta é uma classe abstrata que utiliza a estratégia de herança SINGLE_TABLE.
- * Todos os tipos de usuários (Tutor, Ong, Clinica) serão armazenados na tabela "user_tb",
- * e uma coluna "user_type" irá diferenciar o tipo de cada registro.
+ * Esta é uma classe abstrata que utiliza a estratégia de herança JOINED.
+ * Cada tipo de usuário (Tutor, Ong, Clinica) terá sua própria tabela, 
+ * além de um registro na tabela "user_tb".
  */
 @Entity
 @Data
 @Table(name = "user_tb")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class User implements Serializable {
 

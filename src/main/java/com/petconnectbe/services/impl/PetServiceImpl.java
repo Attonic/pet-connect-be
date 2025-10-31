@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +26,7 @@ public class PetServiceImpl implements PetService {
     private final PetRepository petRepository;
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
-    private final PetMapper petMapper; // Injetando o mapper
+    private final PetMapper petMapper;
 
     @Override
     @Transactional
@@ -33,9 +34,8 @@ public class PetServiceImpl implements PetService {
         User tutor = userRepository.findById(petDto.getTutorId())
             .orElseThrow(() -> new EntityNotFoundException("Tutor não encontrado com o ID: " + petDto.getTutorId()));
 
-        // Usando o mapper para converter DTO para a entidade correta (Dog ou Cat)
         Pet pet = petMapper.toEntity(petDto);
-        pet.setTutor(tutor); // Associa a entidade User completa
+        pet.setTutor(tutor);
 
         if (image != null && !image.isEmpty()) {
             String imageUrl = fileStorageService.store(image);
@@ -43,13 +43,12 @@ public class PetServiceImpl implements PetService {
         }
 
         Pet savedPet = petRepository.save(pet);
-        // Usando o mapper para converter a entidade salva de volta para DTO
         return petMapper.toDto(savedPet);
     }
 
     @Override
     @Transactional
-    public PetDto updatePetImage(Integer id, MultipartFile image) {
+    public PetDto updatePetImage(UUID id, MultipartFile image) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Pet não encontrado com o ID: " + id));
 
@@ -64,7 +63,7 @@ public class PetServiceImpl implements PetService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<PetDto> findById(Integer id) {
+    public Optional<PetDto> findById(UUID id) {
         return petRepository.findById(id).map(petMapper::toDto);
     }
 
@@ -78,23 +77,21 @@ public class PetServiceImpl implements PetService {
 
     @Override
     @Transactional
-    public PetDto update(Integer id, PetDto petDto) {
+    public PetDto update(UUID id, PetDto petDto) {
         Pet existingPet = petRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pet não encontrado com o ID: " + id));
 
-        // Cria uma entidade atualizada a partir do DTO, mas preserva o ID e o tutor
         Pet updatedData = petMapper.toEntity(petDto);
         updatedData.setId(existingPet.getId());
         updatedData.setTutor(existingPet.getTutor());
 
-        // Como o tipo do pet pode mudar, o save() vai lidar com a atualização polimórfica
         Pet savedPet = petRepository.save(updatedData);
         return petMapper.toDto(savedPet);
     }
 
     @Override
     @Transactional
-    public void deleteById(Integer id) {
+    public void deleteById(UUID id) {
         if (!petRepository.existsById(id)) {
             throw new EntityNotFoundException("Pet não encontrado com o ID: " + id);
         }

@@ -1,6 +1,7 @@
 package com.petconnectbe.services;
 
 import com.petconnectbe.dto.PetCardDto;
+import java.util.UUID;
 
 public interface PetCardService {
 
@@ -16,7 +17,7 @@ public interface PetCardService {
      * @param petId O ID do pet.
      * @return O DTO do PetCard encontrado.
      */
-    PetCardDto getPetCardByPetId(Integer petId);
+    PetCardDto getPetCardByPetId(UUID petId);
 
     /**
      * Atualiza as informações de um PetCard existente.
@@ -24,11 +25,11 @@ public interface PetCardService {
      * @param petCardDto O DTO com as novas informações.
      * @return O DTO do PetCard atualizado.
      */
-    PetCardDto updatePetCard(Integer id, PetCardDto petCardDto);
+    PetCardDto updatePetCard(UUID id, PetCardDto petCardDto);
 
     /**
      * Deleta um PetCard pelo seu ID.
      * @param id O ID do PetCard a ser deletado.
      */
-    void deletePetCard(Integer id);
+    void deletePetCard(UUID id);
 }

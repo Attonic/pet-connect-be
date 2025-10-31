@@ -15,7 +15,6 @@ public class PetMapper {
         }
 
         Pet pet;
-        // Decide qual entidade instanciar com base no petType
         if ("DOG".equalsIgnoreCase(dto.getPetType())) {
             Dog dog = new Dog();
             dog.setBreed(dto.getBreed());
@@ -30,11 +29,10 @@ public class PetMapper {
             throw new IllegalArgumentException("Tipo de pet inválido: " + dto.getPetType());
         }
 
-        // Mapeia os campos comuns
         pet.setId(dto.getId());
         pet.setName(dto.getName());
         pet.setWeight(dto.getWeight());
-        pet.setAge(dto.getAge());
+        pet.setBirthDate(dto.getBirthDate());
         pet.setSex(dto.getSex());
         pet.setMicrochipNumber(dto.getMicrochipNumber());
         pet.setAbout(dto.getAbout());
@@ -50,11 +48,10 @@ public class PetMapper {
 
         PetDto dto = new PetDto();
 
-        // Mapeia os campos comuns
         dto.setId(pet.getId());
         dto.setName(pet.getName());
         dto.setWeight(pet.getWeight());
-        dto.setAge(pet.getAge());
+        dto.setBirthDate(pet.getBirthDate());
         dto.setSex(pet.getSex());
         dto.setMicrochipNumber(pet.getMicrochipNumber());
         dto.setAbout(pet.getAbout());
@@ -63,7 +60,6 @@ public class PetMapper {
             dto.setTutorId(pet.getTutor().getId());
         }
 
-        // Mapeia os campos específicos e o petType
         if (pet instanceof Dog) {
             Dog dog = (Dog) pet;
             dto.setPetType("DOG");

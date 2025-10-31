@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 public class PetCardServiceImpl implements PetCardService {
 
@@ -25,7 +27,6 @@ public class PetCardServiceImpl implements PetCardService {
         Pet pet = petRepository.findById(petCardDto.getPetId())
                 .orElseThrow(() -> new RuntimeException("Pet não encontrado com o id: " + petCardDto.getPetId()));
 
-        // Verifica se o pet já possui um cartão
         petCardRepository.findByPetId(petCardDto.getPetId()).ifPresent(pc -> {
             throw new RuntimeException("Este pet já possui um PetCard.");
         });
@@ -33,8 +34,7 @@ public class PetCardServiceImpl implements PetCardService {
         PetCard petCard = new PetCard();
         petCard.setPet(pet);
         petCard.setAllergies(petCardDto.getAllergies());
-        petCard.setBloodType(petCardDto.getBloodType());
-        petCard.setHealthConditions(petCardDto.getHealthConditions()); // Adicionado
+        petCard.setHealthConditions(petCardDto.getHealthConditions());
 
         PetCard savedPetCard = petCardRepository.save(petCard);
 
@@ -43,7 +43,7 @@ public class PetCardServiceImpl implements PetCardService {
 
     @Override
     @Transactional(readOnly = true)
-    public PetCardDto getPetCardByPetId(Integer petId) {
+    public PetCardDto getPetCardByPetId(UUID petId) {
         return petCardRepository.findByPetId(petId)
                 .map(this::toDto)
                 .orElseThrow(() -> new RuntimeException("PetCard não encontrado para o pet com o id: " + petId));
@@ -51,16 +51,13 @@ public class PetCardServiceImpl implements PetCardService {
 
     @Override
     @Transactional
-    public PetCardDto updatePetCard(Integer id, PetCardDto petCardDto) {
+    public PetCardDto updatePetCard(UUID id, PetCardDto petCardDto) {
         PetCard existingPetCard = petCardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("PetCard não encontrado com o id: " + id));
 
-        // Atualiza os campos
         existingPetCard.setAllergies(petCardDto.getAllergies());
-        existingPetCard.setBloodType(petCardDto.getBloodType());
-        existingPetCard.setHealthConditions(petCardDto.getHealthConditions()); // Adicionado
+        existingPetCard.setHealthConditions(petCardDto.getHealthConditions());
 
-        // Salva as alterações
         PetCard updatedPetCard = petCardRepository.save(existingPetCard);
 
         return toDto(updatedPetCard);
@@ -68,7 +65,7 @@ public class PetCardServiceImpl implements PetCardService {
 
     @Override
     @Transactional
-    public void deletePetCard(Integer id) {
+    public void deletePetCard(UUID id) {
         if (!petCardRepository.existsById(id)) {
             throw new RuntimeException("PetCard não encontrado com o id: " + id);
         }
@@ -80,8 +77,7 @@ public class PetCardServiceImpl implements PetCardService {
         dto.setId(petCard.getId());
         dto.setPetId(petCard.getPet().getId());
         dto.setAllergies(petCard.getAllergies());
-        dto.setBloodType(petCard.getBloodType());
-        dto.setHealthConditions(petCard.getHealthConditions()); // Adicionado
+        dto.setHealthConditions(petCard.getHealthConditions());
         return dto;
     }
 }
