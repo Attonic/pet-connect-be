@@ -19,15 +19,4 @@ public class PetCardDto {
      */
     @NotNull(message = "O ID do pet é obrigatório.")
     private UUID petId;
-
-    /**
-     * Alergias conhecidas do Pet.
-     */
-    private String allergies;
-
-    /**
-     * Campo de texto para observações gerais sobre a saúde do pet,
-     * como cirurgias prévias, condições crônicas, etc.
-     */
-    private String healthConditions;
 }

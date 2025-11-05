@@ -34,7 +34,5 @@ public class PetDto {
 
     private String breed;
 
-    private String size;
-
-    private String coatType;
+    private String healthConditions;
 }

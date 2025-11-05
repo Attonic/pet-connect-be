@@ -18,12 +18,10 @@ public class PetMapper {
         if ("DOG".equalsIgnoreCase(dto.getPetType())) {
             Dog dog = new Dog();
             dog.setBreed(dto.getBreed());
-            dog.setSize(dto.getSize());
             pet = dog;
         } else if ("CAT".equalsIgnoreCase(dto.getPetType())) {
             Cat cat = new Cat();
             cat.setBreed(dto.getBreed());
-            cat.setCoatType(dto.getCoatType());
             pet = cat;
         } else {
             throw new IllegalArgumentException("Tipo de pet inválido: " + dto.getPetType());
@@ -37,6 +35,7 @@ public class PetMapper {
         pet.setMicrochipNumber(dto.getMicrochipNumber());
         pet.setAbout(dto.getAbout());
         pet.setImageUrl(dto.getImageUrl());
+        pet.setHealthConditions(dto.getHealthConditions());
 
         return pet;
     }
@@ -60,16 +59,16 @@ public class PetMapper {
             dto.setTutorId(pet.getTutor().getId());
         }
 
+        dto.setHealthConditions(pet.getHealthConditions());
+
         if (pet instanceof Dog) {
             Dog dog = (Dog) pet;
             dto.setPetType("DOG");
             dto.setBreed(dog.getBreed());
-            dto.setSize(dog.getSize());
         } else if (pet instanceof Cat) {
             Cat cat = (Cat) pet;
             dto.setPetType("CAT");
             dto.setBreed(cat.getBreed());
-            dto.setCoatType(cat.getCoatType());
         }
 
         return dto;
