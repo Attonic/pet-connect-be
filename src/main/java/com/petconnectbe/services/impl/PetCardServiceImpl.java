@@ -33,8 +33,6 @@ public class PetCardServiceImpl implements PetCardService {
 
         PetCard petCard = new PetCard();
         petCard.setPet(pet);
-        petCard.setAllergies(petCardDto.getAllergies());
-        petCard.setHealthConditions(petCardDto.getHealthConditions());
 
         PetCard savedPetCard = petCardRepository.save(petCard);
 
@@ -55,8 +53,7 @@ public class PetCardServiceImpl implements PetCardService {
         PetCard existingPetCard = petCardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("PetCard não encontrado com o id: " + id));
 
-        existingPetCard.setAllergies(petCardDto.getAllergies());
-        existingPetCard.setHealthConditions(petCardDto.getHealthConditions());
+        // Não há campos para atualizar no PetCard diretamente nesta implementação
 
         PetCard updatedPetCard = petCardRepository.save(existingPetCard);
 
@@ -76,8 +73,6 @@ public class PetCardServiceImpl implements PetCardService {
         PetCardDto dto = new PetCardDto();
         dto.setId(petCard.getId());
         dto.setPetId(petCard.getPet().getId());
-        dto.setAllergies(petCard.getAllergies());
-        dto.setHealthConditions(petCard.getHealthConditions());
         return dto;
     }
 }

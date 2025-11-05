@@ -3,7 +3,9 @@ package com.petconnectbe.services.impl;
 import com.petconnectbe.dto.PetDto;
 import com.petconnectbe.mappers.PetMapper;
 import com.petconnectbe.models.Pet;
+import com.petconnectbe.models.PetCard;
 import com.petconnectbe.models.User;
+import com.petconnectbe.repositories.PetCardRepository;
 import com.petconnectbe.repositories.PetRepository;
 import com.petconnectbe.repositories.UserRepository;
 import com.petconnectbe.services.FileStorageService;
@@ -25,6 +27,7 @@ public class PetServiceImpl implements PetService {
 
     private final PetRepository petRepository;
     private final UserRepository userRepository;
+    private final PetCardRepository petCardRepository;
     private final FileStorageService fileStorageService;
     private final PetMapper petMapper;
 
@@ -32,7 +35,7 @@ public class PetServiceImpl implements PetService {
     @Transactional
     public PetDto createPet(PetDto petDto, MultipartFile image) {
         User tutor = userRepository.findById(petDto.getTutorId())
-            .orElseThrow(() -> new EntityNotFoundException("Tutor não encontrado com o ID: " + petDto.getTutorId()));
+                .orElseThrow(() -> new EntityNotFoundException("Tutor não encontrado com o ID: " + petDto.getTutorId()));
 
         Pet pet = petMapper.toEntity(petDto);
         pet.setTutor(tutor);
@@ -43,6 +46,38 @@ public class PetServiceImpl implements PetService {
         }
 
         Pet savedPet = petRepository.save(pet);
+
+        PetCard petCard = new PetCard();
+        petCard.setPet(savedPet);
+        petCardRepository.save(petCard);
+
+        return petMapper.toDto(savedPet);
+    }
+
+    @Override
+    @Transactional
+    public PetDto update(UUID id, PetDto petDto) {
+        Pet existingPet = petRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pet não encontrado com o ID: " + id));
+
+        // Atualiza os campos do pet existente com os dados do DTO
+        existingPet.setName(petDto.getName());
+        existingPet.setWeight(petDto.getWeight());
+        existingPet.setBirthDate(petDto.getBirthDate());
+        existingPet.setSex(petDto.getSex());
+        existingPet.setMicrochipNumber(petDto.getMicrochipNumber());
+        existingPet.setAbout(petDto.getAbout());
+        existingPet.setHealthConditions(petDto.getHealthConditions());
+
+        // A lógica para atualizar a raça, etc. permanece no mapper, mas para o objeto existente
+        Pet tempPet = petMapper.toEntity(petDto);
+        if (tempPet instanceof com.petconnectbe.models.Dog && existingPet instanceof com.petconnectbe.models.Dog) {
+            ((com.petconnectbe.models.Dog) existingPet).setBreed(((com.petconnectbe.models.Dog) tempPet).getBreed());
+        } else if (tempPet instanceof com.petconnectbe.models.Cat && existingPet instanceof com.petconnectbe.models.Cat) {
+            ((com.petconnectbe.models.Cat) existingPet).setBreed(((com.petconnectbe.models.Cat) tempPet).getBreed());
+        }
+
+        Pet savedPet = petRepository.save(existingPet);
         return petMapper.toDto(savedPet);
     }
 
@@ -73,20 +108,6 @@ public class PetServiceImpl implements PetService {
         return petRepository.findAll().stream()
                 .map(petMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public PetDto update(UUID id, PetDto petDto) {
-        Pet existingPet = petRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pet não encontrado com o ID: " + id));
-
-        Pet updatedData = petMapper.toEntity(petDto);
-        updatedData.setId(existingPet.getId());
-        updatedData.setTutor(existingPet.getTutor());
-
-        Pet savedPet = petRepository.save(updatedData);
-        return petMapper.toDto(savedPet);
     }
 
     @Override
