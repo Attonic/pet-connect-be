@@ -65,6 +65,13 @@ public abstract class Pet {
     private String about;
 
     /**
+     * Campo de texto para observações gerais sobre a saúde do pet,
+     * como alergias, cirurgias prévias, condições crônicas, etc.
+     */
+    @Column(columnDefinition = "TEXT")
+    private String healthConditions;
+
+    /**
      * URL da imagem de perfil do pet. Pode ser um link para um serviço de
      * armazenamento de arquivos ou um caminho local servido pela aplicação.
      */

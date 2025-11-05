@@ -30,18 +30,6 @@ public class PetCard {
     private Pet pet;
 
     /**
-     * Alergias conhecidas do Pet (texto livre).
-     */
-    private String allergies;
-
-    /**
-     * Campo de texto para observações gerais sobre a saúde do pet,
-     * como cirurgias prévias, condições crônicas, etc.
-     */
-    @Column(columnDefinition = "TEXT")
-    private String healthConditions;
-
-    /**
      * Lista de vacinas associadas a este PetCard.
      * - @OneToMany: Define a relação um-para-muitos (um PetCard para muitas Vacinas).
      * - mappedBy = "petCard": Indica que o lado "muitos" (Vaccine) é o dono da relação.
