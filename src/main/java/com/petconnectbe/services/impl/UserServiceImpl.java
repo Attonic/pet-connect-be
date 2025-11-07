@@ -11,8 +11,11 @@ import com.petconnectbe.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,19 +28,18 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final AddressService addressService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public UserDto save(UserDto userDto) {
         userRepository.findByEmail(userDto.getEmail()).ifPresent(user -> {
-            throw new IllegalArgumentException("Email já cadastrado: " + userDto.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
         });
 
         User user = toEntity(userDto);
 
-        // A senha deve ser criptografada antes de salvar.
-        // Adicionar lógica de criptografia de senha aqui (ex: BCryptPasswordEncoder)
-        // user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
         User savedUser = userRepository.save(user);
         return toDto(savedUser);
@@ -64,10 +66,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o ID: " + id));
 
-        // Copia propriedades comuns
         BeanUtils.copyProperties(userDto, user, "id", "password", "email", "cpfOrCnpj", "birthOrFoundationDate");
 
-        // Atualiza campos específicos baseados no tipo da entidade
         if (user instanceof Tutor) {
             Tutor tutor = (Tutor) user;
             tutor.setCpf(userDto.getCpfOrCnpj());
@@ -83,8 +83,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
-            // Adicionar lógica de criptografia de senha aqui
-            user.setPassword(userDto.getPassword());
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
 
         if (userDto.getAddress() != null) {
@@ -111,10 +110,8 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         UserDto dto = new UserDto();
-        // Copia propriedades comuns
         BeanUtils.copyProperties(user, dto, "password");
 
-        // Define tipo e campos específicos
         if (user instanceof Tutor) {
             Tutor tutor = (Tutor) user;
             dto.setType("TUTOR");
@@ -169,7 +166,6 @@ public class UserServiceImpl implements UserService {
                 throw new IllegalArgumentException("Tipo de usuário desconhecido: " + dto.getType());
         }
 
-        // Copia propriedades comuns do DTO para a entidade
         BeanUtils.copyProperties(dto, user, "id", "cpfOrCnpj", "birthOrFoundationDate");
 
         if (dto.getAddress() != null) {

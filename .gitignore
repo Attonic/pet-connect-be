@@ -1,18 +1,45 @@
-# Arquivos e pastas do ambiente de desenvolvimento
-.idea/
-*.iml
-out/
-.idx/
-.vscode/
-
-# Pasta de arquivos aleatórios
-_aleatorios/
-
 # Arquivos de build do Maven
 target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+build/
+out/
 
 # Arquivo de variáveis de ambiente
 .env
 
 # Arquivos de documentação
 *.md
+HELP.md
+
+# Pasta de arquivos aleatórios
+_aleatorios/
+
+### IDEs e Ferramentas ###
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Visual Studio Code / IDX
+.vscode/
+.idx/
+
+# Spring Tool Suite (STS)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/

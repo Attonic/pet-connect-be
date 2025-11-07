@@ -1,4 +1,3 @@
-
 package com.petconnectbe.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -35,6 +34,7 @@ public class UserDto implements Serializable {
     @NotBlank(message = "O Telefone deve ser informado")
     private String phone;
 
+    @NotNull(message = "A Data de Nascimento é Obrigatória.")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthOrFoundationDate;
 
