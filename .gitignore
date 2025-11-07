@@ -1,11 +1,34 @@
-HELP.md
+# Arquivos de build do Maven
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+build/
+out/
+
+# Arquivo de variáveis de ambiente
 .env
 
-### STS ###
+# Arquivos de documentação
+*.md
+HELP.md
+
+# Pasta de arquivos aleatórios
+_aleatorios/
+
+### IDEs e Ferramentas ###
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Visual Studio Code / IDX
+.vscode/
+.idx/
+
+# Spring Tool Suite (STS)
 .apt_generated
 .classpath
 .factorypath
@@ -14,25 +37,9 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-
-
-### Ambiente IDX ###
-.idx/

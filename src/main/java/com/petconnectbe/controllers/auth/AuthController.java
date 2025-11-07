@@ -3,6 +3,9 @@ package com.petconnectbe.controllers.auth;
 import com.petconnectbe.dto.auth.LoginDto;
 import com.petconnectbe.dto.auth.LoginResponseDto;
 import com.petconnectbe.dto.auth.UserWithRefreshTokenDto;
+import com.petconnectbe.models.Clinica;
+import com.petconnectbe.models.Ong;
+import com.petconnectbe.models.Tutor;
 import com.petconnectbe.models.User;
 import com.petconnectbe.security.TokenService;
 import com.petconnectbe.repositories.UserRepository;
@@ -33,17 +36,16 @@ public class AuthController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        // NOVO CÓDIGO: Gera o Access Token e o Refresh Token como JWTs
         var accessToken = tokenService.generateAccessToken((User) auth.getPrincipal());
         var refreshToken = tokenService.generateRefreshToken((User) auth.getPrincipal());
 
         User user = (User) auth.getPrincipal();
 
         UserWithRefreshTokenDto userDto = new UserWithRefreshTokenDto(
-                user.getUserId(),
+                user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getType(),
+                getUserType(user),
                 refreshToken
         );
 
@@ -52,10 +54,8 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    // NOVO ENDPOINT DE REFRESH TOKEN
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDto> refresh(@RequestBody String refreshToken) {
-        // Valida o Refresh Token como um JWT e extrai o e-mail do usuário
         String userEmail = tokenService.validateToken(refreshToken);
 
         if (userEmail.isEmpty()) {
@@ -65,21 +65,30 @@ public class AuthController {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token."));
 
-        // Gera um novo access token e um novo refresh token
         var newAccessToken = tokenService.generateAccessToken(user);
         var newRefreshToken = tokenService.generateRefreshToken(user);
 
-        // Monta a resposta com os novos tokens
         UserWithRefreshTokenDto userDto = new UserWithRefreshTokenDto(
-                user.getUserId(),
+                user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getType(),
+                getUserType(user),
                 newRefreshToken
         );
 
         LoginResponseDto response = new LoginResponseDto(userDto, newAccessToken);
 
         return ResponseEntity.ok(response);
+    }
+
+    private String getUserType(User user) {
+        if (user instanceof Tutor) {
+            return "TUTOR";
+        } else if (user instanceof Ong) {
+            return "ONG";
+        } else if (user instanceof Clinica) {
+            return "CLINICA";
+        }
+        return "UNKNOWN";
     }
 }

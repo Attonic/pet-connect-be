@@ -16,6 +16,7 @@ public class AddressDto {
     private UUID id;
 
     @NotBlank(message = "O CEP é obrigatório.")
+    @Size(min = 8, max = 8, message = "O CEP deve conter 8 dígitos.")
     private String cep;
 
     @NotBlank(message = "A Rua é obrigatório.")

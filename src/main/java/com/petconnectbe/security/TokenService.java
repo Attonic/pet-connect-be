@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.UUID;
 
 @Service
 public class TokenService {
@@ -40,7 +39,7 @@ public class TokenService {
             return JWT.create()
                     .withIssuer("pet-connect-api")
                     .withSubject(user.getEmail())
-                    .withClaim("id", user.getUserId().toString()) // Opcional: Adicionar ID do usuário
+                    .withClaim("id", user.getId().toString())
                     .withExpiresAt(genRefreshTokenExpirationDate()) // Expira em 7 dias
                     .sign(algorithm);
         } catch (JWTCreationException exception) {

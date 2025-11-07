@@ -1,0 +1,32 @@
+package com.petconnectbe.models;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+/**
+ * Entidade que representa um Pet do tipo Cachorro.
+ * Herda os campos comuns da classe Pet e adiciona campos específicos como raça e porte.
+ */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("DOG")
+public class Dog extends Pet {
+
+    /**
+     * Raça do cachorro.
+     */
+    @Column(name = "breed")
+    private String breed;
+
+    /**
+     * Porte do cachorro (ex: "Pequeno", "Médio", "Grande").
+     */
+    @Column(name = "size")
+    private String size;
+}
