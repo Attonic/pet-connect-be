@@ -31,7 +31,6 @@ public class Address implements Serializable {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "address_id")
     private UUID id;
 
     /**

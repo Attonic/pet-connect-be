@@ -4,15 +4,15 @@
 out/
 .idx/
 .vscode/
+.env
 
 # Pasta de arquivos aleatórios
 _aleatorios/
 
 # Arquivos de build do Maven
 target/
-
-# Arquivo de variáveis de ambiente
-.env
+.mvn/wrapper/maven-wrapper.jar
+build/
 
 # Arquivos de log
 *.log
@@ -20,3 +20,31 @@ target/
 # Arquivos de sistema operacional
 .DS_Store
 Thumbs.db
+
+### IDEs e Ferramentas ###
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Visual Studio Code / IDX
+.vscode/
+.idx/
+
+# Spring Tool Suite (STS)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbuild/
+/dist/
+/nbdist/
+.nb-gradle/
