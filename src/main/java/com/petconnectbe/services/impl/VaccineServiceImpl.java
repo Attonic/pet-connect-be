@@ -12,6 +12,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class VaccineServiceImpl implements VaccineService {
@@ -21,12 +23,12 @@ public class VaccineServiceImpl implements VaccineService {
 
     @Override
     @Transactional
-    public VaccineDto createVaccine(Integer petCardId, VaccineDto vaccineDto) {
+    public VaccineDto createVaccine(UUID petCardId, VaccineDto vaccineDto) {
         PetCard petCard = petCardRepository.findById(petCardId)
                 .orElseThrow(() -> new EntityNotFoundException("PetCard não encontrado com o ID: " + petCardId));
 
         Vaccine vaccine = toEntity(vaccineDto);
-        vaccine.setPetCard(petCard); // Associa a vacina ao PetCard
+        vaccine.setPetCard(petCard);
 
         Vaccine savedVaccine = vaccineRepository.save(vaccine);
         return toDto(savedVaccine);

@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/vaccines")
 @RequiredArgsConstructor
@@ -21,7 +23,7 @@ public class VaccineController {
      * @return a vacina recém-criada com status 201 (Created).
      */
     @PostMapping("/pet-card/{petCardId}")
-    public ResponseEntity<VaccineDto> createVaccine(@PathVariable Integer petCardId, @RequestBody VaccineDto vaccineDto) {
+    public ResponseEntity<VaccineDto> createVaccine(@PathVariable UUID petCardId, @RequestBody VaccineDto vaccineDto) {
         VaccineDto createdVaccine = vaccineService.createVaccine(petCardId, vaccineDto);
         return new ResponseEntity<>(createdVaccine, HttpStatus.CREATED);
     }
