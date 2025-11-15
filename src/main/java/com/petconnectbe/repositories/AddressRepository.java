@@ -1,3 +1,4 @@
+
 package com.petconnectbe.repositories;
 
 import com.petconnectbe.models.Address;
@@ -24,4 +25,14 @@ public interface AddressRepository extends JpaRepository<Address, UUID> {
      * @return Um {@link Optional} contendo o {@link Address} encontrado, ou {@link Optional#empty()} se nenhum for encontrado.
      */
     Optional<Address> findByUf(String uf);
+
+    /**
+     * Busca um endereço pelo ID do seu tutor (usuário).
+     * A convenção de nomenclatura "findByTutorId" instrui o Spring Data JPA a
+     * procurar na entidade Address um campo chamado 'tutor' e filtrar pelo 'id' desse tutor.
+     *
+     * @param tutorId O UUID do tutor (usuário) a ser buscado.
+     * @return Um {@link Optional} contendo o {@link Address} encontrado, ou {@link Optional#empty()} se nenhum for encontrado.
+     */
+    Optional<Address> findByTutorId(UUID tutorId);
 }

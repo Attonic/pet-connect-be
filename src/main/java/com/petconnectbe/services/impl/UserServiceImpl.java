@@ -39,6 +39,12 @@ public class UserServiceImpl implements UserService {
 
         User user = toEntity(userDto);
 
+        // Garante que estamos criando uma nova entidade, ignorando IDs do DTO.
+        user.setId(null);
+        if (user.getAddress() != null) {
+            user.getAddress().setId(null);
+        }
+
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
         User savedUser = userRepository.save(user);

@@ -1,42 +1,44 @@
+
 package com.petconnectbe.services;
 
 import com.petconnectbe.dto.AddressDto;
 import com.petconnectbe.models.Address;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Interface que define o contrato para as operações de negócio relacionadas a Endereços.
- * <p>
- * Esta camada de serviço abstrai a lógica de negócio e as interações com o repositório
- * de dados para a entidade {@link Address}.
+ * Interface que define o contrato para as operações de negócio relacionadas ao Endereço de um Usuário.
+ * A lógica garante que um endereço está sempre associado a um usuário específico.
  */
 public interface AddressService {
 
     /**
-     * Salva ou atualiza um endereço no banco de dados.
+     * Busca o endereço associado a um ID de usuário específico.
      *
-     * @param dto O DTO contendo as informações do endereço a ser salvo.
-     * @return O {@link AddressDto} representando o endereço salvo.
+     * @param userId O UUID do usuário.
+     * @return Um Optional contendo o AddressDto se um endereço for encontrado para o usuário.
      */
-    AddressDto save(AddressDto dto);
+    Optional<AddressDto> findAddressByUserId(UUID userId);
 
     /**
-     * Retorna uma lista com todos os endereços cadastrados.
+     * Cria ou atualiza o endereço para um usuário específico.
+     * Se o usuário já possui um endereço, ele é atualizado. Caso contrário, um novo é criado.
+     * Este método encapsula a lógica de "upsert".
      *
-     * @return Uma lista de {@link AddressDto}.
+     * @param userId O UUID do usuário ao qual o endereço pertence.
+     * @param addressDto O DTO com os dados do endereço.
+     * @return O AddressDto do endereço salvo (criado ou atualizado).
      */
-    List<AddressDto> findAll();
+    AddressDto createOrUpdateAddress(UUID userId, AddressDto addressDto);
 
     /**
-     * Busca um endereço pelo seu identificador único (ID).
+     * Deleta o endereço associado a um ID de usuário específico.
+     * A implementação deve garantir que apenas o endereço do usuário correspondente seja removido.
      *
-     * @param id O UUID do endereço a ser buscado.
-     * @return Um {@link Optional} contendo o {@link AddressDto} se encontrado, ou {@link Optional#empty()} caso contrário.
+     * @param userId O UUID do usuário cujo endereço será deletado.
      */
-    Optional<AddressDto> findById(UUID id);
+    void deleteAddressByUserId(UUID userId);
 
     /**
      * Converte uma entidade {@link Address} para seu respectivo {@link AddressDto}.

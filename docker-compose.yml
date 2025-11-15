@@ -14,14 +14,33 @@ services:
 
   # Serviço da nossa API em Spring Boot
   api:
-    build: .
+    build:
+      context: .
+      # Direciona o compose para usar o estágio 'builder' do Dockerfile, que contém o JDK completo.
+      target: builder
     restart: always
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-8080}:8080"
     depends_on:
       - db
     env_file:
       - ./.env # Aponta para o mesmo arquivo de senhas
+    working_dir: /app
+    volumes:
+      # Mapeia o código-fonte para o container para que o hot reload funcione.
+      - .:/app
+      # Cria um "volume anônimo" para a pasta /app/target.
+      # Isso resolve o problema: impede que a pasta 'target' do seu computador (que pode ser limpa pela IDE)
+      # apague os arquivos .class compilados dentro do container, o que causava os erros
+      # de ClassNotFoundException e falha ao reiniciar.
+      - /app/target
+      # Cria um volume para o cache do Maven para acelerar builds futuros
+      - maven_data:/root/.m2
+    # Substitui o ENTRYPOINT do Dockerfile para rodar em modo de desenvolvimento
+    entrypoint: ./mvnw
+    command: spring-boot:run
 
 volumes:
   postgres_data:
+  # Volume para o cache do Maven
+  maven_data:
