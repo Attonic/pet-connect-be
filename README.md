@@ -1,4 +1,4 @@
-# 🐾 Pet Connect / Back-End
+# 🐾 Pets+ (Back-End)
 
 Este repositório contém o back-end da aplicação **Pet Connect**, um sistema desenvolvido em **Spring Boot com Java** para facilitar o gerenciamento de pets, suas carteirinhas de vacinação e o processo de adoção.
 
