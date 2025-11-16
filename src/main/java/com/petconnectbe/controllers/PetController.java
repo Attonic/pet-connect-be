@@ -1,71 +1,77 @@
+
 package com.petconnectbe.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petconnectbe.dto.PetDto;
 import com.petconnectbe.services.PetService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/pets")
+// Rota aninhada! Agora, todos os pets estão sob o guarda-chuva de um usuário.
+@RequestMapping("/api/v1/users/{userId}/pets")
+@RequiredArgsConstructor
 public class PetController {
 
     private final PetService petService;
-    private final ObjectMapper objectMapper;
 
-    public PetController(PetService petService, ObjectMapper objectMapper) {
-        this.petService = petService;
-        this.objectMapper = objectMapper;
-    }
-
-    @PostMapping(consumes = { "multipart/form-data" })
+    /**
+     * Cria um novo Pet para um usuário específico.
+     * O ID do usuário é pego da URL.
+     */
+    @PostMapping
     public ResponseEntity<PetDto> createPet(
-            @RequestPart("pet") String petJson,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-        try {
-            PetDto petDto = objectMapper.readValue(petJson, PetDto.class);
-            PetDto createdPet = petService.createPet(petDto, image);
-            return new ResponseEntity<>(createdPet, HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+            @PathVariable UUID userId,
+            @RequestPart("pet") PetDto petDto,
+            @RequestParam(value = "image", required = false) MultipartFile image) {
+        // A lógica no service vai associar o pet ao userId.
+        PetDto createdPet = petService.createPet(userId, petDto, image);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPet);
     }
 
-    @PostMapping("/{id}/image")
-    public ResponseEntity<PetDto> updatePetImage(
-            @PathVariable Integer id,
-            @RequestParam("image") MultipartFile image) {
-        PetDto updatedPet = petService.updatePetImage(id, image);
-        return ResponseEntity.ok(updatedPet);
+    /**
+     * Lista todos os Pets de um usuário específico.
+     */
+    @GetMapping
+    public ResponseEntity<List<PetDto>> listAllPetsByUserId(@PathVariable UUID userId) {
+        List<PetDto> pets = petService.findAllByUserId(userId);
+        return ResponseEntity.ok(pets);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PetDto> findPetById(@PathVariable Integer id) {
-        return petService.findById(id)
+    /**
+     * Busca um Pet específico pelo seu ID, dentro do contexto de um usuário.
+     */
+    @GetMapping("/{petId}")
+    public ResponseEntity<PetDto> findPetById(@PathVariable UUID userId, @PathVariable UUID petId) {
+        return petService.findByIdAndUserId(petId, userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping
-    public ResponseEntity<List<PetDto>> findAllPets() {
-        List<PetDto> pets = petService.findAll();
-        return ResponseEntity.ok(pets);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PetDto> updatePet(@PathVariable Integer id, @RequestBody PetDto petDto) {
-        PetDto updatedPet = petService.update(id, petDto);
+    /**
+     * Atualiza um Pet específico.
+     */
+    @PutMapping("/{petId}")
+    public ResponseEntity<PetDto> updatePet(
+            @PathVariable UUID userId,
+            @PathVariable UUID petId,
+            @RequestPart("pet") PetDto petDto,
+            @RequestParam(value = "image", required = false) MultipartFile image) {
+        PetDto updatedPet = petService.updatePet(petId, userId, petDto, image);
         return ResponseEntity.ok(updatedPet);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePet(@PathVariable Integer id) {
-        petService.deleteById(id);
+    /**
+     * Deleta um Pet específico.
+     */
+    @DeleteMapping("/{petId}")
+    public ResponseEntity<Void> deletePet(@PathVariable UUID userId, @PathVariable UUID petId) {
+        petService.deleteByIdAndUserId(petId, userId);
         return ResponseEntity.noContent().build();
     }
 }

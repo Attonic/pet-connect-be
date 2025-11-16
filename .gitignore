@@ -1,20 +1,25 @@
-# Arquivos de build do Maven
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-build/
+# Arquivos e pastas do ambiente de desenvolvimento
+.idea/
+*.iml
 out/
-
-# Arquivo de variáveis de ambiente
+.idx/
+.vscode/
 .env
-
-# Arquivos de documentação
-*.md
-HELP.md
 
 # Pasta de arquivos aleatórios
 _aleatorios/
+
+# Arquivos de build do Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+build/
+
+# Arquivos de log
+*.log
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
 
 ### IDEs e Ferramentas ###
 
@@ -35,11 +40,11 @@ _aleatorios/
 .project
 .settings
 .springBeans
-.sts4-cache
+sts4-cache
 
 # NetBeans
 /nbproject/private/
-/nbbuild/
+/nbuild/
 /dist/
 /nbdist/
-/.nb-gradle/
+.nb-gradle/

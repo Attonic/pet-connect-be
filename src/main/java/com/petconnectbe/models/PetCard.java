@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Representa o cartão de um Pet, chamado de PetCard.
@@ -17,8 +18,8 @@ import java.util.List;
 public class PetCard {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     /**
      * O Pet ao qual este cartão pertence.
@@ -27,23 +28,6 @@ public class PetCard {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "pet_id", referencedColumnName = "id", unique = true)
     private Pet pet;
-
-    /**
-     * Alergias conhecidas do Pet (texto livre).
-     */
-    private String allergies;
-
-    /**
-     * O tipo sanguíneo do Pet.
-     */
-    private String bloodType;
-
-    /**
-     * Campo de texto para observações gerais sobre a saúde do pet,
-     * como cirurgias prévias, condições crônicas, etc.
-     */
-    @Column(columnDefinition = "TEXT")
-    private String healthConditions;
 
     /**
      * Lista de vacinas associadas a este PetCard.

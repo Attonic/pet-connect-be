@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Entidade que representa um Pet do tipo Gato.
- * Herda os campos comuns da classe Pet e adiciona campos específicos como raça e tipo de pelagem.
+ * Herda os campos comuns da classe Pet e adiciona campos específicos como raça.
  */
 @Data
 @NoArgsConstructor
@@ -23,10 +23,4 @@ public class Cat extends Pet {
      */
     @Column(name = "breed")
     private String breed;
-
-    /**
-     * Tipo de pelagem do gato (ex: "Curto", "Longo", "Cacheado").
-     */
-    @Column(name = "coat_type")
-    private String coatType;
 }

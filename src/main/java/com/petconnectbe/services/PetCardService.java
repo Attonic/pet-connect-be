@@ -1,34 +1,33 @@
 package com.petconnectbe.services;
 
 import com.petconnectbe.dto.PetCardDto;
+import com.petconnectbe.models.Pet;
+
+import java.util.UUID;
 
 public interface PetCardService {
 
     /**
      * Cria um novo PetCard para um pet.
-     * @param petCardDto O DTO contendo as informações do novo PetCard.
+     * Este método é chamado internamente quando um novo Pet é criado.
+     * @param pet O pet para o qual o cartão será criado.
      * @return O DTO do PetCard criado.
      */
-    PetCardDto createPetCard(PetCardDto petCardDto);
+    PetCardDto createPetCardForPet(Pet pet);
 
     /**
      * Recupera o PetCard associado a um pet específico.
      * @param petId O ID do pet.
      * @return O DTO do PetCard encontrado.
      */
-    PetCardDto getPetCardByPetId(Integer petId);
+    PetCardDto getPetCardByPetId(UUID petId);
 
     /**
-     * Atualiza as informações de um PetCard existente.
-     * @param id O ID do PetCard a ser atualizado.
+     * Atualiza as informações de um PetCard pelo ID do pet.
+     * @param petId O ID do pet cujo PetCard será atualizado.
      * @param petCardDto O DTO com as novas informações.
      * @return O DTO do PetCard atualizado.
      */
-    PetCardDto updatePetCard(Integer id, PetCardDto petCardDto);
+    PetCardDto updatePetCardByPetId(UUID petId, PetCardDto petCardDto);
 
-    /**
-     * Deleta um PetCard pelo seu ID.
-     * @param id O ID do PetCard a ser deletado.
-     */
-    void deletePetCard(Integer id);
 }

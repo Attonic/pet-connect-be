@@ -4,27 +4,31 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.UUID;
+
 /**
  * Entidade JPA que representa um Pet no banco de dados.
  * Mapeada para a tabela "pets". Contém todas as informações
  * relevantes sobre o animal de estimação.
- * Esta é uma classe base abstrata para uma estratégia de herança polimórfica.
+ * Esta é uma classe base abstrata para uma estratégia de herança polimórfica JOINED.
  */
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "pets")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "pet_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Pet {
 
     /**
      * Chave primária da entidade Pet.
-     * O valor é gerado automaticamente pelo banco de dados (estratégia de identidade).
+     * O valor é gerado automaticamente.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(updatable = false, nullable = false)
+    private UUID id;
 
     /**
      * Nome do pet. Campo obrigatório.
@@ -38,9 +42,9 @@ public abstract class Pet {
     private Double weight;
 
     /**
-     * Idade do pet em anos.
+     * Data de nascimento do pet.
      */
-    private Integer age;
+    private LocalDate birthDate;
 
     /**
      * Sexo do pet (ex: "Macho", "Fêmea").
@@ -54,11 +58,18 @@ public abstract class Pet {
 
     /**
      * Campo de texto livre para informações adicionais sobre o pet,
-     * como comportamento, histórico médico, etc.
+     * como comportamento, histórico, etc.
      * Mapeado para um tipo de coluna que suporta textos longos.
      */
     @Column(columnDefinition = "TEXT")
     private String about;
+
+    /**
+     * Campo de texto para observações gerais sobre a saúde do pet,
+     * como alergias, cirurgias prévias, condições crônicas, etc.
+     */
+    @Column(columnDefinition = "TEXT")
+    private String healthConditions;
 
     /**
      * URL da imagem de perfil do pet. Pode ser um link para um serviço de
@@ -74,4 +85,7 @@ public abstract class Pet {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutor_id", nullable = false)
     private User tutor;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "pet")
+    private PetCard petCard;
 }

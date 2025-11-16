@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Entidade que representa um Pet do tipo Cachorro.
- * Herda os campos comuns da classe Pet e adiciona campos específicos como raça e porte.
+ * Herda os campos comuns da classe Pet e adiciona campos específicos como raça.
  */
 @Data
 @NoArgsConstructor
@@ -23,10 +23,4 @@ public class Dog extends Pet {
      */
     @Column(name = "breed")
     private String breed;
-
-    /**
-     * Porte do cachorro (ex: "Pequeno", "Médio", "Grande").
-     */
-    @Column(name = "size")
-    private String size;
 }
